@@ -59,7 +59,7 @@ const server = http.createServer((req, res) => {
     
     // 请求 body（获取消息列表）
     const postData = JSON.stringify({
-      order: 'desc',
+      order: 'asc',
       limit: 50
     });
     

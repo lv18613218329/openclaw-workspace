@@ -3,48 +3,191 @@ const COZE_TOKEN = "pat_pQIrwCjHqjxkx0j2CcP2cHhd9JCGxTFkcL0hWtSP6Sj7A2KRm3LnpOGX
 let BOT_ID = "7614096304390094889";
 const FLOAT_POSITION = "right";
 
-// ========== 1. 从当前页面URL的channel参数获取参数 ==========
-const currentUrl = new URL(window.location.href);
-const channelParam = currentUrl.searchParams.get("channel");
+console.log("Coze对话查看插件：已加载");
 
-console.log("Coze对话查看插件：当前页面URL=", window.location.href);
-console.log("Coze对话查看插件：channel参数=", channelParam);
-
-let conversation_id = null;
-let user_id = null;
-let chat_id = null;  // 新增 chat_id
-
-if (channelParam) {
+// ========== 1. Base64解码函数 ==========
+function base64Decode(str) {
   try {
-    const channelData = JSON.parse(channelParam);
-    console.log("Coze对话查看插件：解析后的channelData=", channelData);
-    conversation_id = channelData.conversation_id;
-    user_id = channelData.user_Token || channelData.user_id;
-    chat_id = channelData.chat_id || null;  // 获取 chat_id
-    if (channelData.botId) {
-      BOT_ID = channelData.botId;
+    // 处理URL安全的Base64
+    let base64 = str.replace(/-/g, '+').replace(/_/g, '/');
+    // 补齐 padding
+    while (base64.length % 4) {
+      base64 += '=';
     }
-    console.log("Coze对话查看插件：提取的conversation_id=", conversation_id);
-    console.log("Coze对话查看插件：提取的user_id=", user_id);
-    console.log("Coze对话查看插件：提取的chat_id=", chat_id);
-    console.log("Coze对话查看插件：提取的botId=", BOT_ID);
+    return decodeURIComponent(atob(base64).split('').map(function(c) {
+      return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+    }).join(''));
   } catch (e) {
-    console.error("Coze对话查看插件：解析channel参数失败", e);
+    console.error("Coze对话查看插件：Base64解码失败", e);
+    return null;
   }
-} else {
-  console.log("Coze对话查看插件：未找到channel参数");
 }
 
-// 若未检测到conversation_id，不执行后续操作
-if (!conversation_id) {
-  console.log("Coze对话查看插件：未检测到conversation_id，不执行拉取操作");
-} else {
+// ========== 2. 查找并切换到客户信息tab ==========
+function switchToCustomerTab() {
+  return new Promise((resolve) => {
+    // 查找客户信息tab
+    const tabs = document.querySelectorAll('[role="tab"], .tab-item, .ant-tabs-tab, .tabs div');
+    let customerTab = null;
+    
+    for (const tab of tabs) {
+      if (tab.textContent.includes('客户信息') || tab.innerText.includes('客户信息')) {
+        customerTab = tab;
+        break;
+      }
+    }
+    
+    // 如果没找到，更广泛搜索
+    if (!customerTab) {
+      const allElements = document.querySelectorAll('div, span, li, a');
+      for (const el of allElements) {
+        if (el.textContent.includes('客户信息') && el.offsetParent !== null) {
+          // 找到可能接近tablist的元素
+          const parent = el.closest('[role="tablist"]') || el.parentElement;
+          if (parent) {
+            customerTab = el;
+            break;
+          }
+        }
+      }
+    }
+    
+    if (customerTab) {
+      console.log("Coze对话查看插件：找到客户信息tab，点击切换");
+      customerTab.click();
+      // 等待tab切换
+      setTimeout(resolve, 500);
+    } else {
+      console.log("Coze对话查看插件：未找到客户信息tab");
+      resolve();
+    }
+  });
+}
+
+// ========== 3. 从描述字段获取数据 ==========
+function getChannelDataFromDescription() {
+  return new Promise((resolve) => {
+    // 延迟一下等待DOM渲染
+    setTimeout(() => {
+      let descriptionTextarea = null;
+      
+      // 策略1: 直接通过ID查找（最快最准）
+      descriptionTextarea = document.getElementById('description');
+      
+      // 策略2: 通过name属性查找
+      if (!descriptionTextarea || !descriptionTextarea.value) {
+        descriptionTextarea = document.querySelector('textarea[name="description"]');
+      }
+      
+      // 策略3: 查找包含"描述"文字的元素附近的textarea
+      if (!descriptionTextarea || !descriptionTextarea.value) {
+        const labels = document.querySelectorAll('label, .label, .field-label, .ant-form-item-label');
+        for (const label of labels) {
+          if (label.textContent.includes('描述') || label.innerText.includes('描述')) {
+            const container = label.closest('.ant-form-item, .form-item, .field-container, tr, div');
+            if (container) {
+              const textarea = container.querySelector('textarea, input[type="text"]');
+              if (textarea && textarea.value) {
+                descriptionTextarea = textarea;
+                break;
+              }
+            }
+          }
+        }
+      }
+      
+      // 策略4: 查找所有可见的textarea，检查value是否为Base64格式
+      if (!descriptionTextarea || !descriptionTextarea.value) {
+        const allInputs = document.querySelectorAll('textarea, input[type="text"]');
+        for (const input of allInputs) {
+          if (input.value && input.value.length > 20) {
+            try {
+              const decoded = base64Decode(input.value);
+              if (decoded && decoded.includes('conversation_id')) {
+                descriptionTextarea = input;
+                break;
+              }
+            } catch (e) {
+              // 继续查找
+            }
+          }
+        }
+      }
+      
+      console.log("Coze对话查看插件：找到描述字段=", descriptionTextarea ? (descriptionTextarea.id || 'unknown') : "未找到");
+      resolve(descriptionTextarea);
+    }, 800); // 等待DOM渲染
+  });
+}
+
+// ========== 4. 主逻辑 ==========
+async function init() {
+  console.log("Coze对话查看插件：开始检测客户信息...");
+  
+  // 切换到客户信息tab
+  await switchToCustomerTab();
+  
+  // 查找描述字段
+  const descriptionTextarea = await getChannelDataFromDescription();
+  
+  if (!descriptionTextarea) {
+    console.log("Coze对话查看插件：未找到描述字段的文本框或文本框为空，不执行拉取操作");
+    return;
+  }
+  
+  const textboxValue = descriptionTextarea.value;
+  console.log("Coze对话查看插件：描述字段原始值=", textboxValue);
+  
+  // 检查内容是否为空
+  if (!textboxValue || !textboxValue.trim()) {
+    console.log("Coze对话查看插件：描述字段内容为空，不执行拉取操作");
+    return;
+  }
+  
+  // Base64解码
+  const decodedStr = base64Decode(textboxValue);
+  if (!decodedStr) {
+    console.error("Coze对话查看插件：Base64解码失败");
+    return;
+  }
+  
+  console.log("Coze对话查看插件：解码后的字符串=", decodedStr);
+  
+  // 解析JSON
+  let channelData;
+  try {
+    channelData = JSON.parse(decodedStr);
+    console.log("Coze对话查看插件：解析后的channelData=", channelData);
+  } catch (e) {
+    console.error("Coze对话查看插件：解析JSON失败", e);
+    return;
+  }
+  
+  // 提取参数
+  let conversation_id = channelData.conversation_id;
+  let user_id = channelData.user_Token || channelData.user_id;
+  let chat_id = channelData.chat_id || null;
+  
+  if (channelData.botId) {
+    BOT_ID = channelData.botId;
+  }
+  
+  console.log("Coze对话查看插件：提取的conversation_id=", conversation_id);
+  console.log("Coze对话查看插件：提取的user_id=", user_id);
+  console.log("Coze对话查看插件：提取的chat_id=", chat_id);
+  console.log("Coze对话查看插件：提取的botId=", BOT_ID);
+  
+  // 若未检测到conversation_id，不执行后续操作
+  if (!conversation_id) {
+    console.log("Coze对话查看插件：未检测到conversation_id，不执行拉取操作");
+    return;
+  }
+  
   console.log("Coze对话查看插件：检测到对话ID，开始拉取记录");
-  // 拉取对话记录并渲染（传入 chat_id）
   loadCozeChat(conversation_id, user_id, chat_id);
 }
 
-// ========== 2. 调用Coze接口拉取对话记录 ==========
+// ========== 5. 调用Coze接口拉取对话记录 ==========
 async function loadCozeChat(conversationId, userId, chatId) {
   try {
     // 清理token可能的隐藏字符
@@ -56,7 +199,6 @@ async function loadCozeChat(conversationId, userId, chatId) {
     console.log("Coze对话查看插件：准备请求API，conversation_id=", cleanConvId, "chat_id=", cleanChatId);
 
     // 通过代理调用 Coze 官方 API
-    // GET /v1/conversations?conversation_ids=xxx
     const apiPaths = [
       { url: `http://localhost:8888/api/coze?conversation_id=${encodeURIComponent(cleanConvId)}`, method: "GET" }
     ];
@@ -73,7 +215,6 @@ async function loadCozeChat(conversationId, userId, chatId) {
       try {
         let url = api.url;
         
-        // GET请求添加query参数
         if (api.method === "GET" && api.query) {
           const params = new URLSearchParams(api.query).toString();
           url += (url.includes('?') ? '&' : '?') + params;
@@ -112,7 +253,7 @@ async function loadCozeChat(conversationId, userId, chatId) {
     if (!responseData) {
       throw new Error("API调用失败: " + lastError);
     }
-    // 接口返回异常处理
+    
     if (responseData.code !== 0) {
       throw new Error(responseData.msg || "对话记录拉取失败");
     }
@@ -120,20 +261,18 @@ async function loadCozeChat(conversationId, userId, chatId) {
     // 拉取成功，显示会话信息
     console.log("Coze消息列表:", responseData.data);
     
-    // 消息列表渲染
     const messages = responseData.data || [];
     const infoText = `共 ${messages.length} 条消息`;
     
     // 渲染悬浮窗显示消息列表
     renderFloatWindow(messages, userId);
   } catch (error) {
-    // 异常提示
     alert(`Coze对话查看插件：${error.message}`);
     console.error("Coze对话拉取失败：", error);
   }
 }
 
-// ========== 3. 渲染悬浮窗 ==========
+// ========== 6. 渲染悬浮窗 ==========
 function renderFloatWindow(messages, userId) {
   // 避免重复创建悬浮窗
   if (document.getElementById("coze-float-window")) {
@@ -143,7 +282,6 @@ function renderFloatWindow(messages, userId) {
   // 1. 创建悬浮窗容器
   const floatWindow = document.createElement("div");
   floatWindow.id = "coze-float-window";
-  // 设置悬浮窗位置（根据配置）
   const positionStyle = FLOAT_POSITION === "left" ? "left: 20px;" : "right: 20px;";
   floatWindow.style.cssText = `
     position: fixed;
@@ -160,7 +298,7 @@ function renderFloatWindow(messages, userId) {
     overflow: hidden;
   `;
 
-  // 2. 悬浮窗头部（用户ID + 关闭按钮）
+  // 2. 悬浮窗头部
   const floatHeader = document.createElement("div");
   floatHeader.className = "coze-float-header";
   floatHeader.innerHTML = `
@@ -174,20 +312,15 @@ function renderFloatWindow(messages, userId) {
 
   // 4. 渲染对话记录
   if (messages.length === 0) {
-    // 无对话记录
     chatBody.innerHTML = '<div class="coze-empty-chat">暂无对话记录</div>';
   } else {
-    // 渲染每条消息
     messages.forEach(msg => {
       const msgItem = document.createElement("div");
       msgItem.className = `coze-msg coze-msg-${msg.role}`;
 
-      // 根据消息类型渲染不同内容
       if (msg.type === "image" || (msg.content && msg.content.startsWith("http") && /\.(png|jpg|jpeg|gif|webp)/i.test(msg.content))) {
-        // 图片消息
         msgItem.innerHTML = `<img src="${msg.content}" class="coze-msg-img" onclick="previewImage('${msg.content}')" />`;
       } else if (msg.type === "file") {
-        // 文件消息
         try {
           const fileInfo = JSON.parse(msg.content);
           const fileName = fileInfo.file_name || "未知文件";
@@ -203,11 +336,9 @@ function renderFloatWindow(messages, userId) {
             </div>
           `;
         } catch (e) {
-          // 文件解析失败，显示文本
           msgItem.innerText = "文件解析失败，无法显示";
         }
       } else {
-        // 文字消息（转义特殊字符，避免XSS）
         msgItem.innerText = msg.content || "无内容";
       }
 
@@ -215,28 +346,92 @@ function renderFloatWindow(messages, userId) {
     });
   }
 
-  // 5. 组装悬浮窗
   floatWindow.appendChild(floatHeader);
   floatWindow.appendChild(chatBody);
   document.body.appendChild(floatWindow);
 
-  // 6. 绑定关闭按钮事件
   floatWindow.querySelector(".coze-close-btn").onclick = () => {
     floatWindow.remove();
   };
 
-  // 7. 绑定图片预览事件（全局函数，供图片点击调用）
   window.previewImage = function(url) {
-    // 创建图片预览弹窗
     const previewModal = document.createElement("div");
     previewModal.id = "coze-preview-modal";
     previewModal.innerHTML = `<img src="${url}" class="coze-preview-img" />`;
     document.body.appendChild(previewModal);
     
-    // 点击弹窗关闭预览
     previewModal.onclick = () => {
       previewModal.remove();
-      delete window.previewImage; // 移除全局函数，避免残留
+      delete window.previewImage;
     };
   };
 }
+
+// ========== 7. 监听页面和右侧面板变化 ==========
+function setupObserver() {
+  // 监听整个页面变化（检测新的会话）
+  const bodyObserver = new MutationObserver((mutations) => {
+    // 检查是否需要重新初始化
+    // 当检测到会话列表变化时，触发检测
+    let shouldReinit = false;
+    for (const mutation of mutations) {
+      if (mutation.addedNodes.length > 0) {
+        for (const node of mutation.addedNodes) {
+          if (node.nodeType === 1) {
+            // 检测是否添加到对话列表区域
+            if (node.classList?.contains('ant-list-item') || 
+                node.tagName === 'LI' ||
+                node.textContent?.includes('客户信息') ||
+                node.textContent?.includes('描述')) {
+              shouldReinit = true;
+              break;
+            }
+          }
+        }
+      }
+      if (shouldReinit) break;
+    }
+    
+    if (shouldReinit) {
+      console.log("Coze对话查看插件：检测到页面变化，重新执行检测");
+      // 防抖：延迟执行
+      clearTimeout(window.cozeReinitTimer);
+      window.cozeReinitTimer = setTimeout(() => {
+        init();
+      }, 1000);
+    }
+  });
+
+  bodyObserver.observe(document.body, { 
+    childList: true, 
+    subtree: true,
+    attributes: true,
+    attributeFilter: ['class', 'data-state']
+  });
+  
+  console.log("Coze对话查看插件：已设置MutationObserver监听");
+}
+
+// ========== 8. 启动 ==========
+// 页面加载完成后初始化
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => {
+      init();
+      setupObserver();
+    }, 1500);
+  });
+} else {
+  setTimeout(() => {
+    init();
+    setupObserver();
+  }, 1500);
+}
+
+// 额外的窗口加载完成事件
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    init();
+    setupObserver();
+  }, 2000);
+});
