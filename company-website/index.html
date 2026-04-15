@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>成都依能科技股份有限公司</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+      color: #333;
+      line-height: 1.6;
+    }
+    
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    ul {
+      list-style: none;
+    }
+    
+    /* 顶部导航 */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #fff;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      z-index: 1000;
+    }
+    
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 15px 20px;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .logo-img {
+      width: 40px;
+      height: 40px;
+      background: linear-gradient(135deg, #0066cc, #0099ff);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    
+    .logo-text {
+      font-size: 18px;
+      font-weight: 600;
+      color: #0066cc;
+    }
+    
+    .nav-menu {
+      display: flex;
+      gap: 30px;
+    }
+    
+    .nav-menu a {
+      font-size: 15px;
+      color: #333;
+      transition: color 0.3s;
+      position: relative;
+    }
+    
+    .nav-menu a:hover {
+      color: #0066cc;
+    }
+    
+    .nav-menu a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #0066cc;
+      transition: width 0.3s;
+    }
+    
+    .nav-menu a:hover::after {
+      width: 100%;
+    }
+    
+    .nav-contact {
+      padding: 8px 20px;
+      background: #0066cc;
+      color: white;
+      border-radius: 20px;
+      font-size: 14px;
+      transition: background 0.3s;
+    }
+    
+    .nav-contact:hover {
+      background: #0052a3;
+    }
+    
+    /* Banner 区域 */
+    .banner {
+      margin-top: 70px;
+      height: 500px;
+      background: linear-gradient(135deg, #0066cc 0%, #0099ff 50%, #00ccff 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .banner::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 600px;
+      height: 600px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+    }
+    
+    .banner::after {
+      content: '';
+      position: absolute;
+      bottom: -30%;
+      left: -10%;
+      width: 400px;
+      height: 400px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+    }
+    
+    .banner-content {
+      text-align: center;
+      color: white;
+      z-index: 1;
+      padding: 0 20px;
+    }
+    
+    .banner h1 {
+      font-size: 42px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    
+    .banner p {
+      font-size: 18px;
+      opacity: 0.9;
+      max-width: 600px;
+      margin: 0 auto 30px;
+    }
+    
+    .banner-btns {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+    
+    .btn-primary {
+      padding: 12px 30px;
+      background: white;
+      color: #0066cc;
+      border-radius: 25px;
+      font-size: 15px;
+      font-weight: 500;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+    }
+    
+    .btn-outline {
+      padding: 12px 30px;
+      background: transparent;
+      color: white;
+      border: 2px solid white;
+      border-radius: 25px;
+      font-size: 15px;
+      font-weight: 500;
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    .btn-outline:hover {
+      background: white;
+      color: #0066cc;
+    }
+    
+    /* 通用区块样式 */
+    .section {
+      padding: 80px 20px;
+    }
+    
+    .section-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .section-title {
+      text-align: center;
+      margin-bottom: 50px;
+    }
+    
+    .section-title h2 {
+      font-size: 32px;
+      color: #333;
+      margin-bottom: 15px;
+    }
+    
+    .section-title p {
+      font-size: 16px;
+      color: #666;
+    }
+    
+    .section-title .line {
+      width: 60px;
+      height: 3px;
+      background: #0066cc;
+      margin: 15px auto 0;
+    }
+    
+    /* 关于我们 */
+    .about {
+      background: #f8f9fa;
+    }
+    
+    .about-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+    
+    .about-text h3 {
+      font-size: 24px;
+      color: #0066cc;
+      margin-bottom: 20px;
+    }
+    
+    .about-text p {
+      color: #666;
+      margin-bottom: 15px;
+      font-size: 15px;
+    }
+    
+    .about-stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+      margin-top: 30px;
+    }
+    
+    .stat-item {
+      text-align: center;
+      padding: 20px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    }
+    
+    .stat-item .number {
+      font-size: 36px;
+      font-weight: 700;
+      color: #0066cc;
+    }
+    
+    .stat-item .label {
+      font-size: 14px;
+      color: #666;
+      margin-top: 5px;
+    }
+    
+    .about-image {
+      height: 400px;
+      background: linear-gradient(135deg, #e8f4fc, #d6eaf8);
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0066cc;
+      font-size: 18px;
+    }
+    
+    /* 产品服务 */
+    .services {
+      background: white;
+    }
+    
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+    
+    .service-card {
+      padding: 40px 30px;
+      background: #f8f9fa;
+      border-radius: 15px;
+      text-align: center;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .service-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 10px 30px rgba(0,102,204,0.15);
+      background: white;
+    }
+    
+    .service-icon {
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, #0066cc, #0099ff);
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 30px;
+    }
+    
+    .service-card h3 {
+      font-size: 18px;
+      margin-bottom: 15px;
+      color: #333;
+    }
+    
+    .service-card p {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.8;
+    }
+    
+    /* 解决方案 */
+    .solutions {
+      background: #f8f9fa;
+    }
+    
+    .solutions-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 30px;
+    }
+    
+    .solution-card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+      transition: transform 0.3s;
+    }
+    
+    .solution-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .solution-image {
+      height: 200px;
+      background: linear-gradient(135deg, #0066cc, #0099ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 50px;
+    }
+    
+    .solution-content {
+      padding: 25px;
+    }
+    
+    .solution-content h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    
+    .solution-content p {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 15px;
+    }
+    
+    .solution-link {
+      color: #0066cc;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    
+    /* 客户案例 */
+    .cases {
+      background: white;
+    }
+    
+    .cases-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    
+    .case-card {
+      height: 200px;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      border-radius: 10px;
+      display: flex;
+      align-items: flex-end;
+      padding: 20px;
+      color: white;
+      transition: transform 0.3s;
+    }
+    
+    .case-card:hover {
+      transform: scale(1.02);
+    }
+    
+    .case-card:nth-child(2) {
+      background: linear-gradient(135deg, #f093fb, #f5576c);
+    }
+    
+    .case-card:nth-child(3) {
+      background: linear-gradient(135deg, #4facfe, #00f2fe);
+    }
+    
+    .case-card:nth-child(4) {
+      background: linear-gradient(135deg, #43e97b, #38f9d7);
+    }
+    
+    .case-card h4 {
+      font-size: 16px;
+    }
+    
+    .case-card p {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-top: 5px;
+    }
+    
+    /* 新闻动态 */
+    .news {
+      background: #f8f9fa;
+    }
+    
+    .news-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+    
+    .news-card {
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      transition: transform 0.3s;
+    }
+    
+    .news-card:hover {
+      transform: translateY(-5px);
+    }
+    
+    .news-image {
+      height: 180px;
+      background: #e8f4fc;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0066cc;
+      font-size: 40px;
+    }
+    
+    .news-content {
+      padding: 20px;
+    }
+    
+    .news-date {
+      font-size: 12px;
+      color: #999;
+      margin-bottom: 10px;
+    }
+    
+    .news-content h4 {
+      font-size: 16px;
+      color: #333;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+    
+    .news-content p {
+      font-size: 13px;
+      color: #666;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    /* 底部 */
+    .footer {
+      background: #1a1a2e;
+      color: white;
+      padding: 60px 20px 30px;
+    }
+    
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+    
+    .footer-about h3 {
+      font-size: 20px;
+      margin-bottom: 15px;
+    }
+    
+    .footer-about p {
+      font-size: 14px;
+      opacity: 0.7;
+      line-height: 1.8;
+    }
+    
+    .footer-column h4 {
+      font-size: 16px;
+      margin-bottom: 20px;
+      color: #0066cc;
+    }
+    
+    .footer-column ul li {
+      margin-bottom: 12px;
+    }
+    
+    .footer-column a {
+      font-size: 14px;
+      opacity: 0.7;
+      transition: opacity 0.3s;
+    }
+    
+    .footer-column a:hover {
+      opacity: 1;
+    }
+    
+    .footer-bottom {
+      padding-top: 30px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      opacity: 0.6;
+    }
+    
+    .footer-links {
+      display: flex;
+      gap: 20px;
+    }
+    
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .nav-menu {
+        display: none;
+      }
+      
+      .banner {
+        height: 400px;
+      }
+      
+      .banner h1 {
+        font-size: 28px;
+      }
+      
+      .banner p {
+        font-size: 15px;
+      }
+      
+      .about-content {
+        grid-template-columns: 1fr;
+      }
+      
+      .services-grid,
+      .solutions-grid,
+      .news-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .cases-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      
+      .footer-top {
+        grid-template-columns: 1fr;
+      }
+      
+      .footer-bottom {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 顶部导航 -->
+  <header class="header">
+    <div class="nav-container">
+      <div class="logo">
+        <div class="logo-img">依</div>
+        <span class="logo-text">依能科技</span>
+      </div>
+      <nav class="nav-menu">
+        <a href="#about">关于我们</a>
+        <a href="#services">产品服务</a>
+        <a href="#solutions">解决方案</a>
+        <a href="#cases">客户案例</a>
+        <a href="#news">新闻动态</a>
+        <a href="#contact">联系我们</a>
+      </nav>
+      <a href="#contact" class="nav-contact">立即咨询</a>
+    </div>
+  </header>
+  
+  <!-- Banner -->
+  <section class="banner">
+    <div class="banner-content">
+      <h1>专业数字化教学资源</h1>
+      <p>倾情助力老师开展各种形式的信息化教学，让教育更智能、更高效</p>
+      <div class="banner-btns">
+        <a href="#contact" class="btn-primary">了解更多</a>
+        <a href="#services" class="btn-outline">查看产品</a>
+      </div>
+    </div>
+  </section>
+  
+  <!-- 关于我们 -->
+  <section id="about" class="section about">
+    <div class="section-container">
+      <div class="section-title">
+        <h2>关于依能</h2>
+        <p>专注教育信息化，赋能数字化转型</p>
+        <div class="line"></div>
+      </div>
+      <div class="about-content">
+        <div class="about-text">
+          <h3>成都依能科技股份有限公司</h3>
+          <p>依能具备丰富的数字资源建设经验，目前已积累了数千门课程，建设了上万个资源，客户遍布全国。</p>
+          <p>我们致力于为教育行业提供全方位的数字化解决方案，帮助学校和教育机构实现信息化教学，提升教学质量和管理效率。</p>
+          <div class="about-stats">
+            <div class="stat-item">
+              <div class="number">5000+</div>
+              <div class="label">精品课程</div>
+            </div>
+            <div class="stat-item">
+              <div class="number">10000+</div>
+              <div class="label">教学资源</div>
+            </div>
+            <div class="stat-item">
+              <div class="number">500+</div>
+              <div class="label">合作院校</div>
+            </div>
+            <div class="stat-item">
+              <div class="number">30+</div>
+              <div class="label">省份覆盖</div>
+            </div>
+          </div>
+        </div>
+        <div class="about-image">
+          📚 教育信息化解决方案
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- 产品服务 -->
+  <section id="services" class="section services">
+    <div class="section-container">
+      <div class="section-title">
+        <h2>产品与服务</h2>
+        <p>全方位满足教育信息化需求</p>
+        <div class="line"></div>
+      </div>
+      <div class="services-grid">
+        <div class="service-card">
+          <div class="service-icon">📖</div>
+          <h3>数字课程建设</h3>
+          <p>专业的数字课程设计与开发，精品在线课程制作，慕课、微课定制服务</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">🎯</div>
+          <h3>教学资源平台</h3>
+          <p>一站式教学资源管理与分享平台，支持资源上传、分类、检索、在线预览</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">📊</div>
+          <h3>智慧教学系统</h3>
+          <p>AI 驱动的智能教学辅助，提供学情分析、个性化推荐、在线测评等功能</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">🏫</div>
+          <h3>院校信息化建设</h3>
+          <p>为高等院校、职业院校提供整体信息化规划与建设方案</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">🔧</div>
+          <h3>技术支持服务</h3>
+          <p>专业的技术支持团队，提供培训、咨询、运维等全方位服务</p>
+        </div>
+        <div class="service-card">
+          <div class="service-icon">🌐</div>
+          <h3>在线培训平台</h3>
+          <p>企业培训、职业技能培训、教师培训等多元化在线学习解决方案</p>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- 解决方案 -->
+  <section id="solutions" class="section solutions">
+    <div class="section-container">
+      <div class="section-title">
+        <h2>行业解决方案</h2>
+        <p>针对不同场景的定制化方案</p>
+        <div class="line"></div>
+      </div>
+      <div class="solutions-grid">
+        <div class="solution-card">
+          <div class="solution-image">🎓</div>
+          <div class="solution-content">
+            <h3>高等院校数字化</h3>
+            <p>服务本科、高职院校，提供精品课程建设、教学资源平台、智慧教室等整体解决方案</p>
+            <a href="#" class="solution-link">了解更多 →</a>
+          </div>
+        </div>
+        <div class="solution-card">
+          <div class="solution-image">🏤</div>
+          <div class="solution-content">
+            <h3>中职学校信息化</h3>
+            <p>针对中等职业学校特点，提供实训资源、在线技能培训、校企合作平台</p>
+            <a href="#" class="solution-link">了解更多 →</a>
+          </div>
+        </div>
+        <div class="solution-card">
+          <div class="solution-image">🏢</div>
+          <div class="solution-content">
+            <h3>企业培训方案</h3>
+            <p>为企业提供员工培训、学习管理、考试测评等一体化培训解决方案</p>
+            <a href="#" class="solution-link">了解更多 →</a>
+          </div>
+        </div>
+        <div class="solution-card">
+          <div class="solution-image">👨‍🏫</div>
+          <div class="solution-content">
+            <h3>教师专业发展</h3>
+            <p>教师培训、教学能力提升、信息化教学设计等专业发展服务</p>
+            <a href="#" class="solution-link">了解更多 →</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- 客户案例 -->
+  <section id="cases" class="section cases">
+    <div class="section-container">
+      <div class="section-title">
+        <h2>客户案例</h2>
+        <p>已服务全国数百所院校和教育机构</p>
+        <div class="line"></div>
+      </div>
+      <div class="cases-grid">
+        <div class="case-card">
+          <div>
+            <h4>某本科院校</h4>
+            <p>精品在线课程建设</p>
+          </div>
+        </div>
+        <div class="case-card">
+          <div>
+            <h4>某高职院校</h4>
+            <p>智慧教学平台</p>
+          </div>
+        </div>
+        <div class="case-card">
+          <div>
+            <h4>某中职学校</h4>
+            <p>数字化校园建设</p>
+          </div>
+        </div>
+        <div class="case-card">
+          <div>
+            <h4>某企业单位</h4>
+            <p>员工培训系统</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- 新闻动态 -->
+  <section id="news" class="section news">
+    <div class="section-container">
+      <div class="section-title">
+        <h2>新闻动态</h2>
+        <p>了解依能最新资讯</p>
+        <div class="line"></div>
+      </div>
+      <div class="news-grid">
+        <div class="news-card">
+          <div class="news-image">📰</div>
+          <div class="news-content">
+            <div class="news-date">2024-01-15</div>
+            <h4>依能科技荣获"教育信息化优秀服务商"称号</h4>
+            <p>近日，依能科技在2024年教育信息化峰会上荣获"教育信息化优秀服务商"称号...</p>
+          </div>
+        </div>
+        <div class="news-card">
+          <div class="news-image">📰</div>
+          <div class="news-content">
+            <div class="news-date">2024-01-10</div>
+            <h4>成功签约某省重点高校数字化课程建设项目</h4>
+            <p>依能科技与某省重点高校达成合作，将为其建设50门精品在线课程...</p>
+          </div>
+        </div>
+        <div class="news-card">
+          <div class="news-image">📰</div>
+          <div class="news-content">
+            <div class="news-date">2024-01-05</div>
+            <h4>依能科技2024年度产品发布会成功举办</h4>
+            <p>近日，依能科技举办了2024年度产品发布会，发布了新一代智慧教学平台...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Coze Chat SDK -->
+  <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.20/libs/cn/index.js"></script>
+  <script>
+    // ========== 3.1.1 user_id 生成与传入（必做） ==========
+    // 全局变量存储 user_id（避免与网页现有全局变量重名，加前缀 coze_）
+    let coze_user_id = null;
+    
+    // 判断是否为登录用户（这里演示游客模式）
+    // 示例2：登录用户模式（获取平台现有用户ID）
+    // const loggedInUserId = localStorage.getItem('user_id'); // 从本地存储获取登录用户ID
+    // if (loggedInUserId) {
+    //   coze_user_id = loggedInUserId; // 使用平台现有用户唯一标识
+    // } else {
+    
+    // 示例1：游客模式（自动生成临时user_id）
+    coze_user_id = "user_" + Math.random().toString(36).slice(2, 12); // 生成10位随机字符串，确保唯一
+    // }
+    
+    console.log("Coze用户ID生成完成：", coze_user_id);
+    
+    // 全局变量存储 conversation_id（初始值为null）
+    let coze_conversation_id = null;
+    
+    // 全局变量存储 chat_id（每次对话的唯一ID）
+    let coze_chat_id = null;
+
+    // 初始化 Coze SDK，传入生成的 user_id
+    const cozeClient = new CozeWebSDK.WebChatClient({
+      config: {
+        bot_id: '7614096304390094889',
+      },
+      auth: {
+        type: 'token',
+        token: 'pat_pQIrwCjHqjxkx0j2CcP2cHhd9JCGxTFkcL0hWtSP6Sj7A2KRm3LnpOGXs9o5KMpN',
+        onRefreshToken: function () {
+          return 'pat_pQIrwCjHqjxkx0j2CcP2cHhd9JCGxTFkcL0hWtSP6Sj7A2KRm3LnpOGXs9o5KMpN'
+        }
+      },
+      userInfo: {
+        id: coze_user_id, // 传入生成的user_id
+        nickname: '游客'
+      },
+      ui: {
+        base: {
+          lang: 'zh-CN',
+          zIndex: 1000
+        },
+        header: {
+          isShow: true,
+          isNeedClose: true
+        },
+        asstBtn: {
+          isNeed: true
+        },
+        chatBot: {
+          isNeedSwitchAgent: false
+        }
+      }
+    });
+    
+    console.log("Coze SDK 初始化完成，user_id:", coze_user_id);
+    
+    // ========== 3.1.2 conversation_id 和 chat_id 获取（必做） ==========
+    // 使用独立的日志函数避免递归
+    const debugLog = function(...args) {
+      // 使用原生 console 的底层方法
+      Function.prototype.apply.call(console.log, console, args);
+    };
+    
+    debugLog("========== 开始监听获取 conversation_id 和 chat_id ==========");
+    debugLog("【初始化】coze_conversation_id:", coze_conversation_id, "coze_chat_id:", coze_chat_id);
+    
+    // 通过拦截 console.log 来捕获 conversation_id 和 chat_id（Coze SDK 会输出相关信息）
+    const originalLog = console.log;
+    let logDepth = 0;
+    console.log = function(...args) {
+      if (logDepth > 3) return; // 防止递归
+      logDepth++;
+      try {
+        originalLog.apply(console, args);
+        
+        // 检查参数中是否包含 conversation_id 和 chat_id
+        for (const arg of args) {
+          if (arg && typeof arg === 'object') {
+            // 打印所有key用于调试
+            const keys = Object.keys(arg);
+            if (keys.length > 0 && keys.length < 30) {
+              originalLog("【DEBUG】对象keys:", keys.join(", "));
+            }
+            
+            // 获取 conversation_id
+            if (arg.conversation_id && !coze_conversation_id) {
+              coze_conversation_id = arg.conversation_id;
+              originalLog("【获取到 conversation_id】：", coze_conversation_id, "类型:", typeof coze_conversation_id);
+              originalLog("【当前用户 ID】：", coze_user_id);
+            }
+            
+            // 获取真正的 Coze conversationId（纯数字）
+            if (arg.conversationId && String(arg.conversationId).match(/^\d+$/)) {
+              originalLog("【发现真正的conversationId】:", arg.conversationId);
+              // 用纯数字的 conversationId 覆盖
+              coze_conversation_id = arg.conversationId;
+              originalLog("【已更新为真正的conversation_id】：", coze_conversation_id);
+            }
+            
+            // 打印完整对象用于调试
+            if (arg.id && String(arg.id).match(/^\d+$/)) {
+              originalLog("【发现纯数字ID】arg.id:", arg.id);
+            }
+            
+            // 获取 chat_id（尝试多种可能的字段名）
+            const possibleFields = ['id', 'chat_id', 'chatId', 'ChatId', 'session_id', 'sessionId', 'msg_id', 'messageId'];
+            for (const field of possibleFields) {
+              if (arg[field] && !coze_chat_id && String(arg[field]).length > 10) {
+                // 排除纯数字（可能是timestamp）
+                if (!/^\d+$/.test(String(arg[field]))) {
+                  coze_chat_id = arg[field];
+                  originalLog("【获取到 chat_id - 从'" + field + "'字段】：", coze_chat_id);
+                  break;
+                }
+              }
+            }
+          }
+          // 也检查字符串中是否包含
+          if (typeof arg === 'string') {
+            // conversation_id
+            if (arg.includes('conversation_id') && !coze_conversation_id) {
+              const match = arg.match(/conversation_id["']?\s*[:=]\s*['"]?([^'",}\s]+)['"]?/);
+              if (match && match[1]) {
+                coze_conversation_id = match[1];
+                originalLog("【获取到 conversation_id】：", coze_conversation_id);
+                originalLog("【当前用户 ID】：", coze_user_id);
+              }
+            }
+            // chat_id
+            if (arg.includes('chat_id') || arg.includes('"id"')) {
+              const match = arg.match(/(?:chat_)?id["']?\s*[:=]\s*["']([^"']+)["']/);
+              if (match && match[1] && match[1].length > 10) {
+                coze_chat_id = match[1];
+                originalLog("【获取到 chat_id】：", coze_chat_id);
+              }
+            }
+          }
+        }
+      } finally {
+        logDepth--;
+      }
+    };
+    
+    // 打印 cozeClient 的类型和可用方法
+    debugLog("【DEBUG】cozeClient 类型:", typeof cozeClient);
+    debugLog("【DEBUG】cozeClient 方法:", cozeClient ? Object.keys(cozeClient).slice(0, 20) : 'null');
+    
+    // 尝试使用 Coze SDK 事件监听获取 chat_id
+    if (cozeClient && typeof cozeClient.on === 'function') {
+      debugLog("【DEBUG】尝试绑定事件监听...");
+      try {
+        cozeClient.on('conversationStart', (info) => {
+          originalLog("【事件 conversationStart】", info);
+          if (info && info.id) {
+            coze_chat_id = info.id;
+            originalLog("【通过事件获取到 chat_id】：", coze_chat_id);
+          }
+        });
+        
+        cozeClient.on('message', (info) => {
+          originalLog("【事件 message】", info);
+          if (info && info.id && !coze_chat_id) {
+            coze_chat_id = info.id;
+            originalLog("【通过message事件获取到 chat_id】：", coze_chat_id);
+          }
+        });
+        
+        debugLog("【DEBUG】事件监听绑定完成");
+      } catch (e) {
+        debugLog("【事件监听失败】：", e.message);
+      }
+    } else {
+      debugLog("【DEBUG】cozeClient.on 不可用，可能 SDK 版本不同");
+    }
+    
+    // 定时打印当前状态（使用原生方法避免递归）
+    setInterval(() => {
+      Function.prototype.apply.call(console.log, console, ["【状态检查】conversation_id:", coze_conversation_id, "chat_id:", coze_chat_id, "user_id:", coze_user_id]);
+    }, 5000);
+    
+    // ========== 3.1.3 机器人无法回答判断逻辑（必做） ==========
+    // 无法回答关键词列表（与需求文档保持一致，可自定义扩展）
+    const noAnswerKeywords = [
+      "无法回答", "不知道", "无法理解", "暂不支持",
+      "无法帮你", "没有找到", "超出能力", "不清楚", 
+      "无法回答，建议咨询对应主题的专业渠道", "转人工", "转人工客服", "请稍后再试"
+    ];
+    
+    // 标记是否已经显示过转人工按钮（避免重复显示）
+    let hasShownTransferButton = false;
+    
+    // 显示转人工按钮函数
+    function showTransferHumanButton() {
+      // 避免重复创建
+      if (document.getElementById("coze-transfer-human-btn")) return;
+      if (hasShownTransferButton) return;
+      
+      hasShownTransferButton = true;
+      console.log("【检测到无法回答，显示转人工按钮】");
+      
+      // 创建按钮元素
+      const btn = document.createElement("button");
+      btn.id = "coze-transfer-human-btn";
+      btn.innerText = "💁‍♀️ 机器人无法解答，点击转人工客服";
+      // 按钮样式（按需求文档）
+      btn.style.cssText = `
+        margin: 10px auto;
+        display: block;
+        padding: 10px 20px;
+        background: #007fff;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        text-align: center;
+      `;
+      // 绑定点击事件（转人工跳转，后续实现）
+      btn.onclick = goToHumanService;
+      
+      // 直接插入到页面底部（确保可见）
+      document.body.appendChild(btn);
+      btn.style.position = 'fixed';
+      btn.style.bottom = '20px';
+      btn.style.right = '20px';
+      btn.style.zIndex = '999999';
+      console.log("【转人工按钮已插入到页面底部】");
+    }
+    
+    // 移除转人工按钮函数
+    function removeTransferHumanButton() {
+      const btn = document.getElementById("coze-transfer-human-btn");
+      if (btn) {
+        btn.remove();
+        hasShownTransferButton = false;
+        console.log("【转人工按钮已移除】");
+      }
+    }
+    
+    // ========== 3.1.5 转人工跳转逻辑（必做） ==========
+    function goToHumanService() {
+      // 异常处理：未获取到对话ID（用户未发消息）
+      if (!coze_conversation_id) {
+        alert("请先发送一条消息后再转人工");
+        console.log("【转人工失败】未获取到 conversation_id");
+        return;
+      }
+      
+      // 人工客服系统网页地址
+      const humanServiceUrl = "https://yineng.s2.udesk.cn/im_client/";
+      
+      // 构建 channel 参数（JSON格式，包含所需的4个参数：user_Token, conversation_id, chat_id, botId）
+      const channelData = {
+        user_Token: coze_user_id,
+        conversation_id: coze_conversation_id,
+        chat_id: coze_chat_id || "",  // 添加 chat_id（如果没有则为空）
+        botId: '7614096304390094889'  // Coze botId
+      };
+      
+      // 拼接URL，追加 channel 参数
+      const targetUrl = new URL(humanServiceUrl);
+      targetUrl.searchParams.append("channel", JSON.stringify(channelData));
+      
+      console.log("【转人工跳转】目标URL:", targetUrl.toString());
+      console.log("【转人工跳转】channel参数:", channelData);
+      console.log("【转人工跳转】conversation_id:", coze_conversation_id);
+      console.log("【转人工跳转】chat_id:", coze_chat_id);
+      
+      // 新标签页打开人工客服页面
+      window.open(targetUrl.toString(), "_blank");
+    }
+    
+    // 通过定时器检查页面上的消息内容（更可靠的方式）
+    setInterval(() => {
+      // 查找页面上的消息元素（Coze SDK渲染的消息）
+      const messageElements = document.querySelectorAll('[class*="message"], [class*="chat"], .coze-message, [data-role="assistant"]');
+      
+      for (const elem of messageElements) {
+        const text = elem.innerText || elem.textContent || '';
+        if (text.length > 5) {
+          // 检查是否包含关键词
+          const isNoAnswer = noAnswerKeywords.some(keyword => {
+            return text.includes(keyword);
+          });
+          
+          if (isNoAnswer && !hasShownTransferButton) {
+            console.log("【检测到无法回答】消息内容:", text.substring(0, 50));
+            showTransferHumanButton();
+          }
+        }
+      }
+    }, 2000);
+    
+    console.log("【3.1.3 机器人无法回答判断逻辑已加载】");
+  </script>
+  
+  <!-- 底部 -->
+  <footer id="contact" class="footer">
+    <div class="footer-container">
+      <div class="footer-top">
+        <div class="footer-about">
+          <h3>成都依能科技股份有限公司</h3>
+          <p>专注于教育信息化领域，为各类院校和教育机构提供数字化教学资源建设和信息化解决方案。</p>
+        </div>
+        <div class="footer-column">
+          <h4>产品服务</h4>
+          <ul>
+            <li><a href="#">数字课程建设</a></li>
+            <li><a href="#">教学资源平台</a></li>
+            <li><a href="#">智慧教学系统</a></li>
+            <li><a href="#">在线培训平台</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4>解决方案</h4>
+          <ul>
+            <li><a href="#">高等院校</a></li>
+            <li><a href="#">职业院校</a></li>
+            <li><a href="#">企业培训</a></li>
+            <li><a href="#">教师发展</a></li>
+          </ul>
+        </div>
+        <div class="footer-column">
+          <h4>联系我们</h4>
+          <ul>
+            <li><a href="#">成都市高新区</a></li>
+            <li><a href="#">400-888-8888</a></li>
+            <li><a href="#">contact@yineng.com.cn</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <div>© 2024 成都依能科技股份有限公司 版权所有</div>
+        <div class="footer-links">
+          <a href="#">隐私政策</a>
+          <a href="#">服务条款</a>
+          <a href="#">网站地图</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "视频自动下一集",
+  "version": "1.2.0",
+  "description": "依能内训平台 - 视频播放完成后自动跳转到下一集",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["https://cdyineng.weijiangshi.cn/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://cdyineng.weijiangshi.cn/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}

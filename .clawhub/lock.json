@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "skills": {
+    "svg-draw": {
+      "version": "1.0.0",
+      "installedAt": 1774622716692
+    },
+    "ui-ux-design": {
+      "version": "1.0.0",
+      "installedAt": 1774622730121
+    },
+    "mermaid-diagrams": {
+      "version": "0.1.0",
+      "installedAt": 1774622744064
+    }
+  }
+}

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>自动方案</title>
+  <style>
+    body {
+      font-family: "Microsoft YaHei", "SimSun", sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 40px;
+      line-height: 1.8;
+      color: #333;
+    }
+    h1 { color: #2563eb; border-bottom: 2px solid #2563eb; padding-bottom: 10px; }
+    h2 { color: #1e40af; margin-top: 30px; }
+    h3 { color: #3b82f6; }
+    code {
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: Consolas, monospace;
+    }
+    pre {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+    pre code { background: transparent; color: inherit; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+    }
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 10px;
+      text-align: left;
+    }
+    th { background: #f3f4f6; }
+    blockquote {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 10px 20px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+
+<h1>自动方案</h1>
+
+<blockquote>
+<p><strong>对话内容</strong></p>
+<p>我： <code>我如果需要查询全国每个省市的，并且每天需要你增量维护更新这些信息。有没有什么好的技术方案可行？</code></p>
+<p>openclaw：<code>这是个很好的需求！让我给你分析几种可行的技术方案：</code></p>
+</blockquote>
+
+<h2>🎯 推荐方案：OpenClaw Cron + 自动化脚本</h2>
+
+<h3>方案架构</h3>
+<pre><code>┌─────────────────────────────────────────────────────┐
+│                  OpenClaw Gateway                    │
+│  ┌─────────────┐    ┌─────────────┐                 │
+│  │ Cron 定时器  │───▶│  自动化任务  │                 │
+│  │ (每天执行)   │    │  (Skill)    │                 │
+│  └─────────────┘    └──────┬──────┘                 │
+└────────────────────────────┼────────────────────────┘
+                             ▼
+              ┌──────────────────────────┐
+              │   数据采集 & 存储        │
+              │  - 遍历全国省市          │
+              │  - 增量检测              │
+              │  - 保存到 CSV/数据库     │
+              └──────────────────────────┘</code></pre>
+
+<h3>实现方式</h3>
+
+<p><strong>1. 创建采集 Skill</strong></p>
+<p>我可以帮你创建一个专门的 skill，功能包括：</p>
+<ul>
+<li>自动遍历全国31个省市的政府采购信息</li>
+<li>提取项目详情并去重</li>
+<li>增量更新（只保存新增项目）</li>
+<li>支持多种关键词配置</li>
+</ul>
+
+<p><strong>2. 配置 Cron 定时任务</strong></p>
+<pre><code>{
+  "name": "双高建设数据采集",
+  "schedule": { "kind": "cron", "expr": "0 9 * * *" },
+  "payload": { 
+    "kind": "agentTurn", 
+    "message": "运行双高建设采购信息采集任务"
+  },
+  "sessionTarget": "isolated",
+  "delivery": { "mode": "announce" }
+}</code></pre>
+
+<h2>📊 数据存储方案</h2>
+
+<h3>方案A：CSV 文件（简单）</h3>
+<ul>
+<li>每天追加新数据</li>
+<li>适合数据量小、快速上手</li>
+<li>文件：<code>双高建设_全国_[日期].csv</code></li>
+</ul>
+
+<h3>方案B：SQLite 数据库（推荐）</h3>
+<pre><code>CREATE TABLE procurement_items (
+  id INTEGER PRIMARY KEY,
+  title TEXT,
+  url TEXT UNIQUE,
+  publish_date DATE,
+  buyer TEXT,
+  agent TEXT,
+  region TEXT,
+  type TEXT,
+  created_at DATETIME
+);</code></pre>
+
+<h3>方案C：飞书多维表格（协作友好）</h3>
+<ul>
+<li>你已有飞书集成</li>
+<li>可以直接推送到飞书多维表格</li>
+<li>方便团队协作和筛选</li>
+</ul>
+
+<h2>🔧 技术实现细节</h2>
+
+<h3>关键挑战 & 解决方案</h3>
+<table>
+<tr><th>挑战</th><th>解决方案</th></tr>
+<tr><td>网站反爬</td><td>使用 OpenClaw 管理的浏览器，模拟正常访问</td></tr>
+<tr><td>增量更新</td><td>用 URL 或项目编号作为唯一键去重</td></tr>
+<tr><td>大量省市</td><td>分批次查询，每次间隔几秒，避免被封</td></tr>
+<tr><td>数据解析</td><td>使用 ARIA snapshot 提取结构化数据</td></tr>
+</table>
+
+<h3>省市代码映射</h3>
+<pre><code>北京: 11    天津: 12    河北: 13    山西: 14
+内蒙古: 15  辽宁: 21    吉林: 22    黑龙江: 23
+上海: 31    江苏: 32    浙江: 33    安徽: 34
+福建: 35    江西: 36    山东: 37    河南: 41
+湖北: 42    湖南: 43    广东: 44    广西: 45
+海南: 46    重庆: 50    四川: 51    贵州: 52
+云南: 53    西藏: 54    陕西: 61    甘肃: 62
+青海: 63    宁夏: 64    新疆: 65</code></pre>
+
+<h2>🚀 立即可行的方案</h2>
+
+<ol>
+<li><strong>创建采集 Skill</strong> - 包含完整的数据采集逻辑</li>
+<li><strong>配置 Cron 任务</strong> - 每天自动运行</li>
+<li><strong>选择存储方式</strong> - CSV / SQLite / 飞书多维表格</li>
+</ol>
+
+<p>你倾向哪种存储方式？我可以马上开始实现！</p>
+
+</body>
+</html>

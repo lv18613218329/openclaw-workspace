@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "qWQOdNOhNmw=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Administrator\\.openclaw\\workspace\\DiagramEditor.PoC\\src\\DiagramEditor.Core\\DiagramEditor.Core.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Administrator\\.nuget\\packages\\skiasharp\\2.88.9\\skiasharp.2.88.9.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\skiasharp.nativeassets.macos\\2.88.9\\skiasharp.nativeassets.macos.2.88.9.nupkg.sha512",
+    "C:\\Users\\Administrator\\.nuget\\packages\\skiasharp.nativeassets.win32\\2.88.9\\skiasharp.nativeassets.win32.2.88.9.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -1,0 +1,45 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:DiagramEditor.Desktop.ViewModels"
+        xmlns:controls="using:DiagramEditor.Desktop.Views.Controls"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="DiagramEditor.Desktop.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="DiagramEditor - 技术验证"
+        Width="1200" Height="800">
+
+    <Design.DataContext>
+        <vm:MainViewModel/>
+    </Design.DataContext>
+
+    <Grid RowDefinitions="Auto,*">
+        <!-- 工具栏 -->
+        <Border Grid.Row="0" Background="#F5F5F5" BorderBrush="#DDDDDD" BorderThickness="0,0,0,1" Padding="10">
+            <StackPanel Orientation="Horizontal" Spacing="10">
+                <!-- 基础图形 -->
+                <TextBlock Text="基础图形:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <Button Content="矩形" Command="{Binding AddRectangleCommand}" Padding="10,5"/>
+                <Button Content="圆形" Command="{Binding AddCircleCommand}" Padding="10,5"/>
+                <Button Content="多边形" Command="{Binding AddPolygonCommand}" Padding="10,5"/>
+                
+                <Separator Width="1" Background="#CCCCCC" Margin="10,0"/>
+                
+                <!-- 测试功能 -->
+                <TextBlock Text="技术验证:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <Button Content="测试分割" Command="{Binding TestSplitCommand}" Padding="10,5" Background="#E3F2FD"/>
+                <Button Content="测试旋转" Command="{Binding TestRotationCommand}" Padding="10,5" Background="#E8F5E9"/>
+                
+                <Separator Width="1" Background="#CCCCCC" Margin="10,0"/>
+                
+                <Button Content="清空" Command="{Binding ClearCommand}" Padding="10,5" Background="#FFEBEE"/>
+            </StackPanel>
+        </Border>
+        
+        <!-- 主画布 -->
+        <controls:DiagramCanvas Grid.Row="1"
+                                Shapes="{Binding Shapes}"
+                                Connections="{Binding Connections}"/>
+    </Grid>
+</Window>

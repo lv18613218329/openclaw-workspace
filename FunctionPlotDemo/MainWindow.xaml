@@ -1,0 +1,338 @@
+<Window x:Class="FunctionPlotDemo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ScottPlot="clr-namespace:ScottPlot.WPF;assembly=ScottPlot.WPF"
+        mc:Ignorable="d"
+        Title="函数绘图 Demo - ScottPlot + NCalc" 
+        Height="700" Width="1200"
+        WindowStartupLocation="CenterScreen"
+        Background="#F5F5F5">
+    
+    <Window.Resources>
+        <!-- 预制函数按钮样式 -->
+        <Style x:Key="FunctionItemButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="#333"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="8,4"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="#E0E0E0" 
+                                BorderThickness="0,0,0,1"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#E3F2FD"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
+        <!-- 分类标题样式 -->
+        <Style x:Key="CategoryHeader" TargetType="TextBlock">
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Foreground" Value="#1976D2"/>
+            <Setter Property="Margin" Value="0,8,0,4"/>
+        </Style>
+        
+        <!-- 已绘制函数项样式 -->
+        <Style x:Key="PlottedFunctionItem" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="CornerRadius" Value="4"/>
+        </Style>
+    </Window.Resources>
+    
+    <Grid Margin="10">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="220"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        
+        <!-- 左侧：预制函数面板 -->
+        <Border Grid.Column="0" 
+                Background="White" 
+                CornerRadius="8" 
+                Margin="0,0,10,0"
+                Padding="10">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="10" Opacity="0.1" Direction="0"/>
+            </Border.Effect>
+            
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <TextBlock Text="📋 预制函数" 
+                               FontSize="16" 
+                               FontWeight="Bold" 
+                               Margin="0,0,0,10"
+                               Foreground="#333"/>
+                    
+                    <!-- 一次函数 -->
+                    <TextBlock Text="📐 一次函数" Style="{StaticResource CategoryHeader}"/>
+                    <Button Content="y = x" Style="{StaticResource FunctionItemButton}" 
+                            Tag="x" Click="PresetFunction_Click"/>
+                    <Button Content="y = 2x + 1" Style="{StaticResource FunctionItemButton}" 
+                            Tag="2 * x + 1" Click="PresetFunction_Click"/>
+                    <Button Content="y = -x + 3" Style="{StaticResource FunctionItemButton}" 
+                            Tag="-x + 3" Click="PresetFunction_Click"/>
+                    <Button Content="y = 3x - 2" Style="{StaticResource FunctionItemButton}" 
+                            Tag="3 * x - 2" Click="PresetFunction_Click"/>
+                    
+                    <!-- 二次函数 -->
+                    <TextBlock Text="📈 二次函数" Style="{StaticResource CategoryHeader}"/>
+                    <Button Content="y = x²" Style="{StaticResource FunctionItemButton}" 
+                            Tag="x * x" Click="PresetFunction_Click"/>
+                    <Button Content="y = x² + 1" Style="{StaticResource FunctionItemButton}" 
+                            Tag="x * x + 1" Click="PresetFunction_Click"/>
+                    <Button Content="y = 2x² - 3x + 1" Style="{StaticResource FunctionItemButton}" 
+                            Tag="2 * x * x - 3 * x + 1" Click="PresetFunction_Click"/>
+                    <Button Content="y = -x²" Style="{StaticResource FunctionItemButton}" 
+                            Tag="-x * x" Click="PresetFunction_Click"/>
+                    <Button Content="y = (x-1)²" Style="{StaticResource FunctionItemButton}" 
+                            Tag="(x - 1) * (x - 1)" Click="PresetFunction_Click"/>
+                    
+                    <!-- 幂函数 -->
+                    <TextBlock Text="🔢 幂函数" Style="{StaticResource CategoryHeader}"/>
+                    <Button Content="y = x³" Style="{StaticResource FunctionItemButton}" 
+                            Tag="x * x * x" Click="PresetFunction_Click"/>
+                    <Button Content="y = x⁴" Style="{StaticResource FunctionItemButton}" 
+                            Tag="Pow(x, 4)" Click="PresetFunction_Click"/>
+                    <Button Content="y = 1/x" Style="{StaticResource FunctionItemButton}" 
+                            Tag="1 / x" Click="PresetFunction_Click"/>
+                    <Button Content="y = √x" Style="{StaticResource FunctionItemButton}" 
+                            Tag="Sqrt(x)" Click="PresetFunction_Click"/>
+                    <Button Content="y = x^0.5" Style="{StaticResource FunctionItemButton}" 
+                            Tag="Pow(x, 0.5)" Click="PresetFunction_Click"/>
+                    
+                    <!-- 指数函数 -->
+                    <TextBlock Text="📊 指数函数" Style="{StaticResource CategoryHeader}"/>
+                    <Button Content="y = eˣ" Style="{StaticResource FunctionItemButton}" 
+                            Tag="Exp(x)" Click="PresetFunction_Click"/>
+                    <Button Content="y = 2ˣ" Style="{StaticResource FunctionItemButton}" 
+                            Tag="Pow(2, x)" Click="PresetFunction_Click"/>
+                    <Button Content="y = 3ˣ" Style="{StaticResource FunctionItemButton}" 
+                            Tag="Pow(3, x)" Click="PresetFunction_Click"/>
+                    <Button Content="y = e⁻ˣ" Style="{StaticResource FunctionItemButton}" 
+                            Tag="Exp(-x)" Click="PresetFunction_Click"/>
+                    <Button Content="y = 10ˣ" Style="{StaticResource FunctionItemButton}" 
+                            Tag="Pow(10, x)" Click="PresetFunction_Click"/>
+                    
+                    <!-- 对数函数 -->
+                    <TextBlock Text="📝 对数函数" Style="{StaticResource CategoryHeader}"/>
+                    <Button Content="y = ln(x)" Style="{StaticResource FunctionItemButton}" 
+                            Tag="Log(x)" Click="PresetFunction_Click"/>
+                    <Button Content="y = log₁₀(x)" Style="{StaticResource FunctionItemButton}" 
+                            Tag="Log10(x)" Click="PresetFunction_Click"/>
+                    <Button Content="y = ln(x+1)" Style="{StaticResource FunctionItemButton}" 
+                            Tag="Log(x + 1)" Click="PresetFunction_Click"/>
+                    <Button Content="y = 2ln(x)" Style="{StaticResource FunctionItemButton}" 
+                            Tag="2 * Log(x)" Click="PresetFunction_Click"/>
+                    
+                    <!-- 三角函数 -->
+                    <TextBlock Text="📐 三角函数" Style="{StaticResource CategoryHeader}"/>
+                    <Button Content="y = sin(x)" Style="{StaticResource FunctionItemButton}" 
+                            Tag="Sin(x)" Click="PresetFunction_Click"/>
+                    <Button Content="y = cos(x)" Style="{StaticResource FunctionItemButton}" 
+                            Tag="Cos(x)" Click="PresetFunction_Click"/>
+                    <Button Content="y = tan(x)" Style="{StaticResource FunctionItemButton}" 
+                            Tag="Tan(x)" Click="PresetFunction_Click"/>
+                    <Button Content="y = sin(2x)" Style="{StaticResource FunctionItemButton}" 
+                            Tag="Sin(2 * x)" Click="PresetFunction_Click"/>
+                    <Button Content="y = sin(x) + cos(x)" Style="{StaticResource FunctionItemButton}" 
+                            Tag="Sin(x) + Cos(x)" Click="PresetFunction_Click"/>
+                    <Button Content="y = 2sin(x)" Style="{StaticResource FunctionItemButton}" 
+                            Tag="2 * Sin(x)" Click="PresetFunction_Click"/>
+                    <Button Content="y = sin²(x)" Style="{StaticResource FunctionItemButton}" 
+                            Tag="Sin(x) * Sin(x)" Click="PresetFunction_Click"/>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+        
+        <!-- 右侧：输入和图表 -->
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            
+            <!-- 输入区域 -->
+            <Border Grid.Row="0" 
+                    Background="White" 
+                    CornerRadius="8" 
+                    Padding="15"
+                    Margin="0,0,0,10">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" Opacity="0.1" Direction="270"/>
+                </Border.Effect>
+                
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <TextBlock Grid.Column="0" 
+                               Text="表达式:" 
+                               FontSize="14" 
+                               VerticalAlignment="Center"
+                               Margin="0,0,10,0"
+                               Foreground="#666"/>
+                    
+                    <TextBox Grid.Column="1" 
+                             x:Name="FunctionInput" 
+                             Text="x * x"
+                             FontSize="16"
+                             Padding="10"
+                             VerticalContentAlignment="Center"
+                             KeyDown="FunctionInput_KeyDown"/>
+                    
+                    <Button Grid.Column="2" 
+                            Content="➕ 绘制" 
+                            Padding="15,8"
+                            Margin="10,0,0,0"
+                            FontSize="14"
+                            FontWeight="Bold"
+                            Background="#4CAF50"
+                            Foreground="White"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            Click="PlotButton_Click">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}" 
+                                        CornerRadius="5" 
+                                        Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                    
+                    <Button Grid.Column="3" 
+                            Content="🗑 全部清除" 
+                            Padding="15,8"
+                            Margin="10,0,0,0"
+                            FontSize="14"
+                            Background="#f44336"
+                            Foreground="White"
+                            BorderThickness="0"
+                            Cursor="Hand"
+                            Click="ClearAllButton_Click">
+                        <Button.Template>
+                            <ControlTemplate TargetType="Button">
+                                <Border Background="{TemplateBinding Background}" 
+                                        CornerRadius="5" 
+                                        Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </ControlTemplate>
+                        </Button.Template>
+                    </Button>
+                </Grid>
+            </Border>
+            
+            <!-- 已绘制函数列表 -->
+            <Border Grid.Row="1" 
+                    Background="White" 
+                    CornerRadius="8" 
+                    Padding="10"
+                    Margin="0,0,0,10"
+                    x:Name="PlottedFunctionsPanel">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" Opacity="0.1" Direction="270"/>
+                </Border.Effect>
+                
+                <StackPanel>
+                    <TextBlock Text="📊 已绘制函数:" 
+                               FontSize="13" 
+                               FontWeight="Bold"
+                               Foreground="#666"
+                               Margin="0,0,0,8"/>
+                    
+                    <ItemsControl x:Name="PlottedFunctionsList">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="#F5F5F5" 
+                                        CornerRadius="4" 
+                                        Padding="8,4" 
+                                        Margin="0,0,8,4">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Rectangle Width="20" Height="3" 
+                                                   Fill="{Binding ColorBrush}" 
+                                                   Margin="0,0,8,0"
+                                                   VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding DisplayName}" 
+                                                   VerticalAlignment="Center"
+                                                   FontSize="12"/>
+                                        <Button Content="✕" 
+                                                Margin="8,0,0,0"
+                                                Padding="4,0"
+                                                FontSize="10"
+                                                Background="Transparent"
+                                                BorderThickness="0"
+                                                Cursor="Hand"
+                                                Foreground="#999"
+                                                Tag="{Binding}"
+                                                Click="RemoveFunction_Click"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    
+                    <TextBlock x:Name="NoFunctionsText" 
+                               Text="暂无绘制函数，请从左侧选择或输入表达式" 
+                               FontSize="12" 
+                               Foreground="#999"
+                               Margin="0,4,0,0"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- 图表区域 -->
+            <Border Grid.Row="2" 
+                    Background="White" 
+                    CornerRadius="8">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="10" Opacity="0.1" Direction="270"/>
+                </Border.Effect>
+                
+                <ScottPlot:WpfPlot x:Name="PlotControl"/>
+            </Border>
+            
+            <!-- 状态栏 -->
+            <StatusBar Grid.Row="3" Background="Transparent" Margin="0,5,0,0">
+                <StatusBarItem>
+                    <TextBlock x:Name="StatusText" Text="就绪 - 点击左侧预制函数或输入表达式开始绘制" Foreground="#666"/>
+                </StatusBarItem>
+                <StatusBarItem HorizontalAlignment="Right">
+                    <TextBlock Text="技术方案: ScottPlot + NCalc | .NET 8.0" 
+                               Foreground="#999" 
+                               FontSize="11"/>
+                </StatusBarItem>
+            </StatusBar>
+        </Grid>
+    </Grid>
+</Window>

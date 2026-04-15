@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Temporary files
+*.tmp
+*.temp
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Build outputs
+dist/
+build/
+out/
+
+# IDE
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+
+# Archives (keep source code)
+*.zip
+*.rar
+*.7z
+
+# Large media files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.pdf

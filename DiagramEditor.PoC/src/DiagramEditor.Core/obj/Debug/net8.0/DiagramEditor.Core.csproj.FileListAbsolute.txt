@@ -1,0 +1,12 @@
+C:\Users\Administrator\.openclaw\workspace\DiagramEditor.PoC\src\DiagramEditor.Core\obj\Debug\net8.0\DiagramEditor.Core.csproj.AssemblyReference.cache
+C:\Users\Administrator\.openclaw\workspace\DiagramEditor.PoC\src\DiagramEditor.Core\obj\Debug\net8.0\DiagramEditor.Core.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Administrator\.openclaw\workspace\DiagramEditor.PoC\src\DiagramEditor.Core\obj\Debug\net8.0\DiagramEditor.Core.AssemblyInfoInputs.cache
+C:\Users\Administrator\.openclaw\workspace\DiagramEditor.PoC\src\DiagramEditor.Core\obj\Debug\net8.0\DiagramEditor.Core.AssemblyInfo.cs
+C:\Users\Administrator\.openclaw\workspace\DiagramEditor.PoC\src\DiagramEditor.Core\obj\Debug\net8.0\DiagramEditor.Core.csproj.CoreCompileInputs.cache
+C:\Users\Administrator\.openclaw\workspace\DiagramEditor.PoC\src\DiagramEditor.Core\bin\Debug\net8.0\DiagramEditor.Core.deps.json
+C:\Users\Administrator\.openclaw\workspace\DiagramEditor.PoC\src\DiagramEditor.Core\bin\Debug\net8.0\DiagramEditor.Core.dll
+C:\Users\Administrator\.openclaw\workspace\DiagramEditor.PoC\src\DiagramEditor.Core\bin\Debug\net8.0\DiagramEditor.Core.pdb
+C:\Users\Administrator\.openclaw\workspace\DiagramEditor.PoC\src\DiagramEditor.Core\obj\Debug\net8.0\DiagramEditor.Core.dll
+C:\Users\Administrator\.openclaw\workspace\DiagramEditor.PoC\src\DiagramEditor.Core\obj\Debug\net8.0\refint\DiagramEditor.Core.dll
+C:\Users\Administrator\.openclaw\workspace\DiagramEditor.PoC\src\DiagramEditor.Core\obj\Debug\net8.0\DiagramEditor.Core.pdb
+C:\Users\Administrator\.openclaw\workspace\DiagramEditor.PoC\src\DiagramEditor.Core\obj\Debug\net8.0\ref\DiagramEditor.Core.dll
