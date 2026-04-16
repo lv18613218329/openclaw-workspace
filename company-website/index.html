@@ -865,6 +865,30 @@
   <!-- Coze Chat SDK -->
   <script src="https://lf-cdn.coze.cn/obj/unpkg/flow-platform/chat-app-sdk/1.2.0-beta.20/libs/cn/index.js"></script>
   <script>
+    // 清除 Coze SDK 的会话记录（确保每次打开都是新对话）
+    function clearCozeSession() {
+      // 清除 localStorage 中的 Coze 相关数据
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (key.includes('coze') || key.includes('Coze') || key.includes('conversation'))) {
+          localStorage.removeItem(key);
+          i--;
+        }
+      }
+      // 清除 sessionStorage
+      for (let i = 0; i < sessionStorage.length; i++) {
+        const key = sessionStorage.key(i);
+        if (key && (key.includes('coze') || key.includes('Coze') || key.includes('conversation'))) {
+          sessionStorage.removeItem(key);
+          i--;
+        }
+      }
+      console.log("【Coze会话已清空】每次打开将创建新对话");
+    }
+    
+    // 页面加载时立即清除会话（尽早执行）
+    clearCozeSession();
+    
     // ========== 3.1.1 user_id 生成与传入（必做） ==========
     // 全局变量存储 user_id（避免与网页现有全局变量重名，加前缀 coze_）
     let coze_user_id = null;
