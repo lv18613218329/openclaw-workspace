@@ -264,10 +264,17 @@ async function loadCozeChat(conversationId, userId, chatId) {
       throw new Error(responseData.msg || "对话记录拉取失败");
     }
 
-    // 拉取成功，显示会话信息
+    // 拉取成功，检查是否有消息
     console.log("Coze消息列表:", responseData.data);
     
     const messages = responseData.data || [];
+    
+    // 如果没有消息，不显示悬浮窗
+    if (messages.length === 0) {
+      console.log("Coze对话查看插件：没有消息记录，隐藏窗口");
+      return;
+    }
+    
     const infoText = `共 ${messages.length} 条消息`;
     
     // 渲染悬浮窗显示消息列表
@@ -398,57 +405,37 @@ function renderFloatWindow(messages, userId) {
   };
 }
 
-// ========== 7. 监听页面和右侧面板变化 ==========
-let isInitializing = false; // 防止重复初始化
+// ========== 7. 监听左侧会话列表点击 ==========
+let lastInitTime = 0;
+const INIT_INTERVAL = 2000; // 2秒内不重复执行
 
-function setupObserver() {
-  // 监听整个页面变化（检测新的会话）
-  const bodyObserver = new MutationObserver((mutations) => {
-    // 防止重复初始化
-    if (isInitializing) return;
+function setupConversationListener() {
+  // 监听左侧会话列表的点击事件
+  document.addEventListener('click', (e) => {
+    const now = Date.now();
+    // 检查是否点击了会话列表项
+    const conversationItem = e.target.closest('.ant-list-item, .conversation-item, [class*="conversation"], li');
     
-    // 检查是否需要重新初始化
-    // 当检测到会话列表变化时，触发检测
-    let shouldReinit = false;
-    for (const mutation of mutations) {
-      if (mutation.addedNodes.length > 0) {
-        for (const node of mutation.addedNodes) {
-          if (node.nodeType === 1) {
-            // 检测是否添加到对话列表区域
-            if (node.classList?.contains('ant-list-item') || 
-                node.tagName === 'LI' ||
-                node.textContent?.includes('客户信息') ||
-                node.textContent?.includes('描述')) {
-              shouldReinit = true;
-              break;
-            }
-          }
-        }
+    if (conversationItem) {
+      console.log("Coze对话查看插件：检测到会话列表点击");
+      
+      // 2秒内不重复执行
+      if (now - lastInitTime < INIT_INTERVAL) {
+        console.log("Coze对话查看插件：距离上次执行不足2秒，跳过");
+        return;
       }
-      if (shouldReinit) break;
-    }
-    
-    if (shouldReinit) {
-      console.log("Coze对话查看插件：检测到页面变化，重新执行检测");
+      
+      lastInitTime = now;
+      
       // 防抖：延迟执行
       clearTimeout(window.cozeReinitTimer);
       window.cozeReinitTimer = setTimeout(() => {
-        isInitializing = true;
-        init().finally(() => {
-          isInitializing = false;
-        });
-      }, 1000);
+        init();
+      }, 800);
     }
   });
-
-  bodyObserver.observe(document.body, { 
-    childList: true, 
-    subtree: true,
-    attributes: true,
-    attributeFilter: ['class', 'data-state']
-  });
   
-  console.log("Coze对话查看插件：已设置MutationObserver监听");
+  console.log("Coze对话查看插件：已设置会话列表点击监听");
 }
 
 // ========== 8. 启动 ==========
@@ -463,7 +450,7 @@ if (document.readyState === 'loading') {
 } else {
   setTimeout(() => {
     init();
-    setupObserver();
+    setupConversationListener();
   }, 1500);
 }
 
@@ -471,6 +458,6 @@ if (document.readyState === 'loading') {
 window.addEventListener('load', () => {
   setTimeout(() => {
     init();
-    setupObserver();
+    setupConversationListener();
   }, 2000);
 });
