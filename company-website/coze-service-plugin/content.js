@@ -55,8 +55,8 @@ function switchToCustomerTab() {
     if (customerTab) {
       console.log("Coze对话查看插件：找到客户信息tab，点击切换");
       customerTab.click();
-      // 等待tab切换
-      setTimeout(resolve, 500);
+      // 等待tab切换和DOM渲染
+      setTimeout(resolve, 1000);
     } else {
       console.log("Coze对话查看插件：未找到客户信息tab");
       resolve();
