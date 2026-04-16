@@ -1127,12 +1127,12 @@
         botId: '7613384266394894370'  // Coze botId
       };
       
-      // 拼接URL，追加 description 参数
+      // 拼接URL，追加 description 参数（Base64编码）
       const targetUrl = new URL(humanServiceUrl);
-      targetUrl.searchParams.append("description", JSON.stringify(channelData));
+      targetUrl.searchParams.append("description", btoa(JSON.stringify(channelData)));
       
       console.log("【转人工跳转】目标URL:", targetUrl.toString());
-      console.log("【转人工跳转】description参数:", channelData);
+      console.log("【转人工跳转】description参数(Base64):", btoa(JSON.stringify(channelData)));
       console.log("【转人工跳转】conversation_id:", coze_conversation_id);
       console.log("【转人工跳转】chat_id:", coze_chat_id);
       
@@ -1295,7 +1295,7 @@
       };
       
       const targetUrl = new URL(humanServiceUrl);
-      targetUrl.searchParams.append("description", JSON.stringify(channelData));
+      targetUrl.searchParams.append("description", btoa(JSON.stringify(channelData)));
       
       console.log("【自动转人工】跳转URL:", targetUrl.toString());
       
