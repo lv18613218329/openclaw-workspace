@@ -1131,6 +1131,111 @@
       
       // 新标签页打开人工客服页面
       window.open(targetUrl.toString(), "_blank");
+      
+      // 关闭 Coze 聊天窗口
+      closeCozeChatWindow();
+    }
+    
+    // 关闭 Coze 聊天窗口（只关闭聊天窗口，不移除入口按钮）
+    function closeCozeChatWindow() {
+      console.log("【关闭 Coze 聊天窗口】开始执行");
+      
+      let closed = false;
+      
+      // 方法1: 调用 Coze SDK 的 close 方法
+      if (cozeClient && typeof cozeClient.close === 'function') {
+        try {
+          cozeClient.close();
+          console.log("【关闭 Coze 聊天窗口】cozeClient.close() 执行成功");
+          closed = true;
+        } catch (e) {
+          console.log("【关闭 Coze 聊天窗口】cozeClient.close() 失败:", e.message);
+        }
+      }
+      
+      // 方法2: 查找并隐藏 Coze 聊天窗口容器（Coze SDK 常见的类名）
+      const chatSelectors = [
+        '.coze-web-chat',
+        '.coze-chat-container',
+        '.coze-chat-root',
+        '[class*="coze-web"]',
+        '[class*="coze-chat"]',
+        '[id*="coze"]',
+        '[class*="chatBot"]',
+        '[class*="chat-bot"]',
+        // 底部聊天气泡
+        '.coze-bottom-sheet',
+        '.coze-floating',
+        '[class*="bubble"]',
+        // 弹出式聊天窗口
+        '.coze-modal',
+        '.coze-popup'
+      ];
+      
+      for (const selector of chatSelectors) {
+        const elements = document.querySelectorAll(selector);
+        for (const el of elements) {
+          const rect = el.getBoundingClientRect();
+          if (el.offsetParent !== null && rect.width > 30 && rect.height > 30) {
+            el.style.display = 'none';
+            console.log("【关闭 Coze 聊天窗口】隐藏元素:", selector, "尺寸:", rect.width, "x", rect.height);
+            closed = true;
+          }
+        }
+      }
+      
+      // 方法3: 查找并隐藏 Coze iframe
+      const iframes = document.querySelectorAll('iframe');
+      for (const iframe of iframes) {
+        if (iframe.src && (iframe.src.includes('coze') || iframe.src.includes('chat'))) {
+          iframe.style.display = 'none';
+          console.log("【关闭 Coze 聊天窗口】隐藏 iframe");
+          closed = true;
+        }
+      }
+      
+      // 方法4: 查找页面右下角的聊天入口/气泡，通常是固定定位
+      const floatingButtons = document.querySelectorAll('[style*="position: fixed"][style*="bottom"]');
+      for (const btn of floatingButtons) {
+        const rect = btn.getBoundingClientRect();
+        // 检查是否是较大的聊天窗口（不是小按钮）
+        if (rect.width > 300 && rect.height > 300) {
+          btn.style.display = 'none';
+          console.log("【关闭 Coze 聊天窗口】隐藏右下角浮动窗口");
+          closed = true;
+        }
+      }
+      
+      // 方法5: 尝试通过 Coze SDK 配置的 zIndex 查找聊天窗口
+      const allElements = document.querySelectorAll('*');
+      let chatWindow = null;
+      for (const el of allElements) {
+        const style = window.getComputedStyle(el);
+        const zIndex = parseInt(style.zIndex);
+        if (zIndex > 9999 && style.position === 'fixed') {
+          const rect = el.getBoundingClientRect();
+          if (rect.width > 280 && rect.height > 200) {
+            chatWindow = el;
+            console.log("【关闭 Coze 聊天窗口】找到高 zIndex 固定定位元素", 
+              "zIndex:", zIndex, "尺寸:", rect.width, "x", rect.height);
+            break;
+          }
+        }
+      }
+      
+      if (chatWindow) {
+        chatWindow.style.display = 'none';
+        closed = true;
+      }
+      
+      if (closed) {
+        console.log("【关闭 Coze 聊天窗口】成功关闭");
+      } else {
+        console.log("【关闭 Coze 聊天窗口】未找到可关闭的聊天窗口");
+        // 输出页面所有固定定位元素用于调试
+        const fixedElements = document.querySelectorAll('[style*="position: fixed"]');
+        console.log("【调试】页面固定定位元素数量:", fixedElements.length);
+      }
     }
     
     // 通过定时器检查页面上的消息内容（更可靠的方式）
