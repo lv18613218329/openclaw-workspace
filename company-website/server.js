@@ -3,7 +3,7 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const COZE_TOKEN = "pat_pQIrwCjHqjxkx0j2CcP2cHhd9JCGxTFkcL0hWtSP6Sj7A2KRm3LnpOGXs9o5KMpN";
+const COZE_TOKEN = "pat_iTZYL67lEmWkaTODMfRlegntBpqjTZ2AtqjdTvdW6si2SNZhvwMZY1F5da1fipyR";
 
 const server = http.createServer((req, res) => {
   console.log('收到请求:', req.method, req.url);
@@ -55,7 +55,7 @@ const server = http.createServer((req, res) => {
     console.log('收到请求 conversation_id:', conversation_id, 'bot_id:', bot_id);
     
     // 需要 bot_id 参数
-    const botId = bot_id || '7614096304390094889';
+    const botId = bot_id || '7613384266394894370';
     
     // POST /v1/conversation/message/list?conversation_id=xxx (获取聊天记录)
     const targetPath = `/v1/conversation/message/list?conversation_id=${conversation_id}`;
