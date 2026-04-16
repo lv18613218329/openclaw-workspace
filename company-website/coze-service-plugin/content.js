@@ -26,41 +26,119 @@ function base64Decode(str) {
 // ========== 2. 查找并切换到客户信息tab ==========
 function switchToCustomerTab() {
   return new Promise((resolve) => {
-    // 查找客户信息tab
-    const tabs = document.querySelectorAll('[role="tab"], .tab-item, .ant-tabs-tab, .tabs div');
-    let customerTab = null;
-    
-    for (const tab of tabs) {
-      if (tab.textContent.includes('客户信息') || tab.innerText.includes('客户信息')) {
-        customerTab = tab;
-        break;
-      }
-    }
-    
-    // 如果没找到，更广泛搜索
-    if (!customerTab) {
-      const allElements = document.querySelectorAll('div, span, li, a');
-      for (const el of allElements) {
-        if (el.textContent.includes('客户信息') && el.offsetParent !== null) {
-          // 找到可能接近tablist的元素
-          const parent = el.closest('[role="tablist"]') || el.parentElement;
-          if (parent) {
-            customerTab = el;
-            break;
+    // 等待一小段时间确保DOM完全渲染
+    setTimeout(() => {
+      // 策略1: 查找role="tab"且文本包含"客户信息"的元素
+      let customerTab = null;
+      
+      // 先尝试通过tablist和tab role属性查找
+      const tabList = document.querySelector('[role="tablist"]');
+      
+      if (tabList) {
+        const tabs = tabList.querySelectorAll('[role="tab"]');
+        for (const tab of tabs) {
+          const text = (tab.textContent?.trim() || tab.innerText?.trim() || '').replace(/\s+/g, ' ');
+          if (text.includes('客户信息')) {
+            // 检查是否已经是选中状态
+            const isSelected = tab.getAttribute('aria-selected') === 'true' || 
+                tab.classList.contains('ant-tabs-tab-active') ||
+                tab.classList.contains('selected') ||
+                tab.classList.contains('active');
+            
+            if (isSelected) {
+              console.log("Coze对话查看插件：客户信息tab已经是选中状态");
+              resolve();
+              return;
+            }
+            
+            // 找到未选中的客户信息tab，点击它
+            customerTab = tab;
+            console.log("Coze对话查看插件：找到客户信息tab，准备点击切换");
+            tab.click();
+            
+            // 等待tab切换完成（多次等待确保切换成功）
+            setTimeout(() => {
+              // 再次检查是否切换成功
+              const afterClickTab = Array.from(tabs).find(t => 
+                (t.textContent?.trim() || t.innerText?.trim() || '').replace(/\s+/g, ' ').includes('客户信息')
+              );
+              if (afterClickTab) {
+                const isNowSelected = afterClickTab.getAttribute('aria-selected') === 'true' || 
+                    afterClickTab.classList.contains('ant-tabs-tab-active');
+                if (isNowSelected) {
+                  console.log("Coze对话查看插件：客户信息tab切换成功");
+                } else {
+                  console.log("Coze对话查看插件：客户信息tab点击后未选中，尝试再次点击");
+                  afterClickTab.click();
+                  setTimeout(resolve, 500);
+                  return;
+                }
+              }
+              resolve();
+            }, 600);
+            return;
           }
         }
       }
-    }
-    
-    if (customerTab) {
-      console.log("Coze对话查看插件：找到客户信息tab，点击切换");
-      customerTab.click();
-      // 等待tab切换和DOM渲染
-      setTimeout(resolve, 1000);
-    } else {
+      
+      // 策略2: 直接查找包含"客户信息"的元素（更广泛的搜索）
+      if (!customerTab) {
+        const allElements = document.querySelectorAll('div, span, li, a, button, p');
+        for (const el of allElements) {
+          const text = (el.textContent?.trim() || el.innerText?.trim() || '').replace(/\s+/g, ' ');
+          if (text === '客户信息' && el.offsetParent !== null && el.isVisible?.() !== false) {
+            // 尝试找父级tablist
+            let parent = el.parentElement;
+            let foundTabList = false;
+            for (let i = 0; i < 5; i++) {
+              if (parent && parent.getAttribute?.('role') === 'tablist') {
+                foundTabList = true;
+                break;
+              }
+              parent = parent?.parentElement;
+            }
+            if (foundTabList) {
+              customerTab = el;
+              console.log("Coze对话查看插件：策略2找到客户信息tab，点击切换");
+              el.click();
+              setTimeout(resolve, 600);
+              return;
+            }
+          }
+        }
+      }
+      
+      // 策略3: 如果找不到且当前不是客户信息tab，则尝试通过tabpanel查找
+      if (!customerTab) {
+        // 查找当前显示的tabpanel对应的tab
+        const visiblePanel = document.querySelector('[role="tabpanel"]:not([aria-hidden="true"])');
+        if (visiblePanel) {
+          const panelId = visiblePanel.id;
+          if (panelId) {
+            const linkedTab = document.querySelector(`[role="tab"][aria-controls="${panelId}"], [role="tab"][href="#${panelId}"]`);
+            if (linkedTab) {
+              const tabText = (linkedTab.textContent?.trim() || linkedTab.innerText?.trim() || '').replace(/\s+/g, ' ');
+              // 如果当前不是客户信息tab，查找客户信息tab
+              if (!tabText.includes('客户信息')) {
+                const allTabs = document.querySelectorAll('[role="tab"]');
+                for (const t of allTabs) {
+                  const tText = (t.textContent?.trim() || t.innerText?.trim() || '').replace(/\s+/g, ' ');
+                  if (tText.includes('客户信息')) {
+                    console.log("Coze对话查看插件：策略3找到客户信息tab，点击切换");
+                    t.click();
+                    setTimeout(resolve, 600);
+                    return;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      
       console.log("Coze对话查看插件：未找到客户信息tab");
       resolve();
-    }
+    }, 300); // 初始延迟
   });
 }
 
@@ -131,7 +209,22 @@ function injectAIChatButton(descriptionTextarea) {
     return;
   }
   
-  if (!descriptionTextarea) return;
+  if (!descriptionTextarea || !descriptionTextarea.value) return;
+  
+  // 检查是否为有效的Base64 JSON数据
+  let channelData;
+  try {
+    const decoded = base64Decode(descriptionTextarea.value);
+    channelData = JSON.parse(decoded);
+    // 检查是否包含必要的字段
+    if (!channelData.conversation_id) {
+      console.log("Coze对话查看插件：描述字段数据无效（无conversation_id）");
+      return;
+    }
+  } catch (e) {
+    console.log("Coze对话查看插件：描述字段不是有效的Base64 JSON");
+    return;
+  }
   
   // 找到描述字段的容器
   const container = descriptionTextarea.closest('tr, .ant-form-item, .form-item, .field-container, div');
@@ -490,15 +583,113 @@ let lastInitTime = 0;
 const INIT_INTERVAL = 2000; // 2秒内不重复执行
 
 function setupConversationListener() {
-  // 监听左侧会话列表的点击事件
+  // 监听整个文档的点击事件
   document.addEventListener('click', (e) => {
     const now = Date.now();
-    // 检查是否点击了会话列表项
-    const conversationItem = e.target.closest('.ant-list-item, .conversation-item, [class*="conversation"], li');
+    const target = e.target;
     
-    if (conversationItem) {
-      console.log("Coze对话查看插件：检测到会话列表点击");
-      
+    // 检查是否在左侧会话列表区域
+    // 通过检查点击元素是否在特定的容器内来判断
+    let clickedInConversationArea = false;
+    
+    // 方法1: 检查点击的元素是否在带有cursor:pointer的元素内（会话列表项的特征）
+    let element = target;
+    let depth = 0;
+    while (element && depth < 15) {
+      if (element.nodeType === 1) {
+        const style = element.getAttribute?.('style') || '';
+        const className = element.className || '';
+        
+        // 检查是否有cursor:pointer（会话列表项通常有这个属性）
+        if (style.includes('cursor') && style.includes('pointer')) {
+          // 进一步检查是否在左侧面板区域 - 向上查找更多层级
+          let parent = element;
+          let foundLeftPanel = false;
+          for (let i = 0; i < 12; i++) {
+            if (!parent) break;
+            const pClass = parent.className || '';
+            const pId = parent.id || '';
+            if (typeof pClass === 'string') {
+              if (pClass.includes('left') || pClass.includes('panel') || 
+                  pClass.includes('list') || pClass.includes('sidebar') ||
+                  pClass.includes('conversation') || pClass.includes('item') ||
+                  pClass.includes('content') || pClass.includes('main')) {
+                foundLeftPanel = true;
+                break;
+              }
+            }
+            // 也检查id
+            if (typeof pId === 'string' && pId.length > 0) {
+              if (pId.includes('left') || pId.includes('panel') || 
+                  pId.includes('list') || pId.includes('sidebar') ||
+                  pId.includes('conversation')) {
+                foundLeftPanel = true;
+                break;
+              }
+            }
+            parent = parent.parentElement;
+          }
+          if (foundLeftPanel) {
+            clickedInConversationArea = true;
+            console.log("Coze对话查看插件：检测到左侧会话列表点击 (cursor:pointer)");
+            break;
+          }
+        }
+        
+        // 方法2: 检查class名称
+        if (typeof className === 'string' && className.length > 0) {
+          if (className.includes('list-item') || 
+              className.includes('conversation') ||
+              className.includes('List') ||
+              className.includes('item') ||
+              className.includes('sidebar') ||
+              className.includes('left')) {
+            clickedInConversationArea = true;
+            console.log("Coze对话查看插件：检测到左侧会话列表点击 (class匹配):", className);
+            break;
+          }
+        }
+      }
+      element = element.parentElement;
+      depth++;
+    }
+    
+    // 方法3: 检查是否点击了tab按钮（我的/留言/同事/排队）
+    if (!clickedInConversationArea) {
+      const tabButton = target.closest?.('button');
+      if (tabButton) {
+        const tabText = tabButton.textContent?.trim() || '';
+        if (['我的', '留言', '同事', '排队'].includes(tabText)) {
+          clickedInConversationArea = true;
+          console.log("Coze对话查看插件：检测到tab切换:", tabText);
+        }
+      }
+    }
+    
+    // 方法4: 检查是否点击了当前/历史/回访切换
+    if (!clickedInConversationArea) {
+      const currentHistoryBtn = target.closest?.('[class*="current"], [class*="history"], [class*="visit"]');
+      if (currentHistoryBtn) {
+        clickedInConversationArea = true;
+        console.log("Coze对话查看插件：检测到当前/历史/回访切换");
+      }
+    }
+    
+    // 方法5: 如果以上都没匹配，但点击了会话列表中的具体项（通过位置判断）
+    // 检查点击的元素是否在tablist上方（左侧面板）
+    if (!clickedInConversationArea) {
+      const tabList = document.querySelector('[role="tablist"]');
+      if (tabList) {
+        const rect = tabList.getBoundingClientRect();
+        // 如果点击位置在tablist左边，说明是左侧面板
+        if (target !== tabList && e.clientX < rect.left && e.clientY > rect.top) {
+          clickedInConversationArea = true;
+          console.log("Coze对话查看插件：检测到左侧会话列表点击 (位置判断)");
+        }
+      }
+    }
+    
+    if (clickedInConversationArea) {
       // 2秒内不重复执行
       if (now - lastInitTime < INIT_INTERVAL) {
         console.log("Coze对话查看插件：距离上次执行不足2秒，跳过");
@@ -507,29 +698,80 @@ function setupConversationListener() {
       
       lastInitTime = now;
       
-      // 防抖：延迟执行
+      // 防抖：延迟执行，等待页面切换完成
       clearTimeout(window.cozeReinitTimer);
       window.cozeReinitTimer = setTimeout(() => {
+        console.log("Coze对话查看插件：开始重新初始化...");
         init();
-      }, 800);
+      }, 1200);
     }
   });
   
   console.log("Coze对话查看插件：已设置会话列表点击监听");
 }
 
-// ========== 8. 启动 ==========
+// ========== 8. 监听页面变化（MutationObserver）============
+function setupObserver() {
+  // 监听页面变化，当会话列表更新时自动触发
+  const observer = new MutationObserver((mutations) => {
+    let shouldReinit = false;
+    
+    for (const mutation of mutations) {
+      if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+        for (const node of mutation.addedNodes) {
+          // 检查是否添加了会话列表项
+          if (node.nodeType === 1) {
+            const isConversationItem = node.classList?.contains('ant-list-item') || 
+              node.classList?.contains('conversation-item') ||
+              node.querySelector?.('.ant-list-item, .conversation-item');
+            
+            if (isConversationItem) {
+              console.log("Coze对话查看插件：检测到会话列表变化");
+              shouldReinit = true;
+              break;
+            }
+          }
+        }
+      }
+      
+      if (shouldReinit) break;
+    }
+    
+    if (shouldReinit) {
+      const now = Date.now();
+      // 2秒防抖
+      if (now - lastInitTime > 2000) {
+        clearTimeout(window.cozeObserverTimer);
+        window.cozeObserverTimer = setTimeout(() => {
+          init();
+        }, 500);
+      }
+    }
+  });
+  
+  // 观察整个文档区域
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+  
+  console.log("Coze对话查看插件：已设置MutationObserver监听");
+}
+
+// ========== 9. 启动 ==========
 // 页面加载完成后初始化
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
       init();
       setupObserver();
+      setupConversationListener();
     }, 1500);
   });
 } else {
   setTimeout(() => {
     init();
+    setupObserver();
     setupConversationListener();
   }, 1500);
 }
