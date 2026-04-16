@@ -1,5 +1,5 @@
 // ========== 插件核心配置 ==========
-const COZE_TOKEN = "pat_pQIrwCjHqjxkx0j2CcP2cHhd9JCGxTFkcL0hWtSP6Sj7A2KRm3LnpOGXs9o5KMpN";
+const COZE_TOKEN = "pat_iTZYL67lEmWkaTODMfRlegntBpqjTZ2AtqjdTvdW6si2SNZhvwMZY1F5da1fipyR";
 let BOT_ID = "7614096304390094889";
 const FLOAT_POSITION = "right";
 
