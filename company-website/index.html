@@ -1073,64 +1073,6 @@
     }, 5000);
     
     // ========== 3.1.3 机器人无法回答判断逻辑（必做） ==========
-    // 无法回答关键词列表（与需求文档保持一致，可自定义扩展）
-    const noAnswerKeywords = [
-      "无法回答", "不知道", "无法理解", "暂不支持",
-      "无法帮你", "没有找到", "超出能力", "不清楚", 
-      "无法回答，建议咨询对应主题的专业渠道", "转人工", "转人工客服", "请稍后再试"
-    ];
-    
-    // 标记是否已经显示过转人工按钮（避免重复显示）
-    let hasShownTransferButton = false;
-    
-    // 显示转人工按钮函数
-    function showTransferHumanButton() {
-      // 避免重复创建
-      if (document.getElementById("coze-transfer-human-btn")) return;
-      if (hasShownTransferButton) return;
-      
-      hasShownTransferButton = true;
-      console.log("【检测到无法回答，显示转人工按钮】");
-      
-      // 创建按钮元素
-      const btn = document.createElement("button");
-      btn.id = "coze-transfer-human-btn";
-      btn.innerText = "💁‍♀️ 机器人无法解答，点击转人工客服";
-      // 按钮样式（按需求文档）
-      btn.style.cssText = `
-        margin: 10px auto;
-        display: block;
-        padding: 10px 20px;
-        background: #007fff;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
-        text-align: center;
-      `;
-      // 绑定点击事件（转人工跳转，后续实现）
-      btn.onclick = goToHumanService;
-      
-      // 直接插入到页面底部（确保可见）
-      document.body.appendChild(btn);
-      btn.style.position = 'fixed';
-      btn.style.bottom = '20px';
-      btn.style.right = '20px';
-      btn.style.zIndex = '999999';
-      console.log("【转人工按钮已插入到页面底部】");
-    }
-    
-    // 移除转人工按钮函数
-    function removeTransferHumanButton() {
-      const btn = document.getElementById("coze-transfer-human-btn");
-      if (btn) {
-        btn.remove();
-        hasShownTransferButton = false;
-        console.log("【转人工按钮已移除】");
-      }
-    }
-    
     // ========== 3.1.5 转人工跳转逻辑（必做） ==========
     // 固定的客服链接参数（从示例获取）
     const UDESK_FIXED_PARAMS = {
@@ -1287,27 +1229,6 @@
         console.log("【调试】页面固定定位元素数量:", fixedElements.length);
       }
     }
-    
-    // 通过定时器检查页面上的消息内容（更可靠的方式）
-    setInterval(() => {
-      // 查找页面上的消息元素（Coze SDK渲染的消息）
-      const messageElements = document.querySelectorAll('[class*="message"], [class*="chat"], .coze-message, [data-role="assistant"]');
-      
-      for (const elem of messageElements) {
-        const text = elem.innerText || elem.textContent || '';
-        if (text.length > 5) {
-          // 检查是否包含关键词
-          const isNoAnswer = noAnswerKeywords.some(keyword => {
-            return text.includes(keyword);
-          });
-          
-          if (isNoAnswer && !hasShownTransferButton) {
-            console.log("【检测到无法回答】消息内容:", text.substring(0, 50));
-            showTransferHumanButton();
-          }
-        }
-      }
-    }, 2000);
     
     // ========== 监听用户发送消息，自动转人工 ==========
     // 关键词列表
