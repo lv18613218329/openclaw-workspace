@@ -1119,20 +1119,20 @@
       // 人工客服系统网页地址
       const humanServiceUrl = "https://yineng.s2.udesk.cn/im_client/";
       
-      // 构建 channel 参数（JSON格式，包含所需的4个参数：user_Token, conversation_id, chat_id, botId）
+      // 构建 described 参数（JSON格式，包含所需的4个参数：user_Token, conversation_id, chat_id, botId）
       const channelData = {
         user_Token: coze_user_id,
         conversation_id: coze_conversation_id,
         chat_id: coze_chat_id || "",  // 添加 chat_id（如果没有则为空）
-        botId: '7614096304390094889'  // Coze botId
+        botId: '7613384266394894370'  // Coze botId
       };
       
-      // 拼接URL，追加 channel 参数
+      // 拼接URL，追加 described 参数
       const targetUrl = new URL(humanServiceUrl);
-      targetUrl.searchParams.append("channel", JSON.stringify(channelData));
+      targetUrl.searchParams.append("described", JSON.stringify(channelData));
       
       console.log("【转人工跳转】目标URL:", targetUrl.toString());
-      console.log("【转人工跳转】channel参数:", channelData);
+      console.log("【转人工跳转】described参数:", channelData);
       console.log("【转人工跳转】conversation_id:", coze_conversation_id);
       console.log("【转人工跳转】chat_id:", coze_chat_id);
       
@@ -1286,16 +1286,16 @@
       // 人工客服系统网页地址
       const humanServiceUrl = "https://yineng.s2.udesk.cn/im_client/";
       
-      // 构建 channel 参数
+      // 构建 described 参数
       const channelData = {
         user_Token: coze_user_id,
         conversation_id: coze_conversation_id || "",
         chat_id: coze_chat_id || "",
-        botId: '7614096304390094889'
+        botId: '7613384266394894370'
       };
       
       const targetUrl = new URL(humanServiceUrl);
-      targetUrl.searchParams.append("channel", JSON.stringify(channelData));
+      targetUrl.searchParams.append("described", JSON.stringify(channelData));
       
       console.log("【自动转人工】跳转URL:", targetUrl.toString());
       
