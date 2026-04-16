@@ -124,6 +124,12 @@ function getChannelDataFromDescription() {
 async function init() {
   console.log("Coze对话查看插件：开始检测客户信息...");
   
+  // 切换会话时，先移除旧的悬浮窗
+  const existingWindow = document.getElementById("coze-float-window");
+  if (existingWindow) {
+    existingWindow.remove();
+  }
+  
   // 切换到客户信息tab
   await switchToCustomerTab();
   
@@ -317,32 +323,57 @@ function renderFloatWindow(messages, userId) {
     messages.forEach(msg => {
       const msgItem = document.createElement("div");
       msgItem.className = `coze-msg coze-msg-${msg.role}`;
-
-      if (msg.type === "image" || (msg.content && msg.content.startsWith("http") && /\.(png|jpg|jpeg|gif|webp)/i.test(msg.content))) {
-        msgItem.innerHTML = `<img src="${msg.content}" class="coze-msg-img" onclick="previewImage('${msg.content}')" />`;
-      } else if (msg.type === "file") {
-        try {
-          const fileInfo = JSON.parse(msg.content);
-          const fileName = fileInfo.file_name || "未知文件";
-          const fileSize = (fileInfo.size / 1024).toFixed(1) + "KB";
-          const fileUrl = fileInfo.url || "#";
-          msgItem.innerHTML = `
-            <div class="coze-file-box">
-              <div>
-                <div class="coze-file-name">${fileName}</div>
-                <div class="coze-file-size">${fileSize}</div>
-              </div>
-              <a href="${fileUrl}" target="_blank" class="coze-file-download">下载</a>
-            </div>
-          `;
-        } catch (e) {
-          msgItem.innerText = "文件解析失败，无法显示";
-        }
-      } else {
-        msgItem.innerText = msg.content || "无内容";
+      
+      const content = msg.content || "";
+      
+      // 策略1: 检测Markdown图片格式 ![文字](URL)
+      const markdownImageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
+      let match;
+      const imageUrls = [];
+      let processedContent = content;
+      
+      while ((match = markdownImageRegex.exec(content)) !== null) {
+        imageUrls.push(match[2]); // URL在第二个捕获组
       }
-
-      chatBody.appendChild(msgItem);
+      
+      // 如果有Markdown图片，移除图片语法，只保留文字部分
+      processedContent = processedContent.replace(markdownImageRegex, '');
+      
+      // 策略2: 直接检测URL是否为图片（以常见图片扩展名结尾）
+      const imageUrlRegex = /(https?:\/\/[^\s]+\.(?:png|jpg|jpeg|gif|webp)[^\s]*)/gi;
+      while ((match = imageUrlRegex.exec(content)) !== null) {
+        if (!imageUrls.includes(match[1])) {
+          imageUrls.push(match[1]);
+        }
+      }
+      
+      // 渲染图片（如果有）
+      imageUrls.forEach(imgUrl => {
+        const imgElem = document.createElement("img");
+        imgElem.src = imgUrl;
+        imgElem.className = "coze-msg-img";
+        imgElem.onclick = function() { previewImage(this.src); };
+        imgElem.style.maxWidth = "100%";
+        imgElem.style.borderRadius = "8px";
+        imgElem.style.marginTop = "8px";
+        imgElem.style.cursor = "pointer";
+        chatBody.appendChild(imgElem);
+      });
+      
+      // 渲染文字内容（移除图片语法后）
+      if (processedContent.trim()) {
+        // 检测是否为纯URL（没有其他文字）
+        const urlOnlyRegex = /^https?:\/\/[^\s]+$/;
+        if (urlOnlyRegex.test(processedContent.trim()) && imageUrls.length === 0) {
+          // 纯URL，渲染成可点击链接
+          msgItem.innerHTML = `<a href="${processedContent.trim()}" target="_blank">${processedContent.trim()}</a>`;
+        } else {
+          // 换行处理
+          const textContent = processedContent.trim().replace(/\n/g, '<br>');
+          msgItem.innerHTML = textContent;
+        }
+        chatBody.appendChild(msgItem);
+      }
     });
   }
 

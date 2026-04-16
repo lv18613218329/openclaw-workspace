@@ -1154,7 +1154,129 @@
       }
     }, 2000);
     
-    console.log("【3.1.3 机器人无法回答判断逻辑已加载】");
+    // ========== 监听用户发送消息，自动转人工 ==========
+    // 关键词列表
+    const userMessageKeywords = ['人工', '人工客服', '转人工', '客服'];
+    
+    // 标记是否已经自动跳转过（避免重复跳转）
+    let hasAutoTransfered = false;
+    
+    // 自动转人工函数
+    function autoTransferToHumanService() {
+      if (hasAutoTransfered) return; // 防止重复跳转
+      if (!coze_conversation_id) {
+        console.log("【自动转人工】未获取到 conversation_id，跳转后补充");
+      }
+      
+      hasAutoTransfered = true;
+      console.log("【自动转人工】检测到用户消息包含关键词，准备跳转...");
+      
+      // 人工客服系统网页地址
+      const humanServiceUrl = "https://yineng.s2.udesk.cn/im_client/";
+      
+      // 构建 channel 参数
+      const channelData = {
+        user_Token: coze_user_id,
+        conversation_id: coze_conversation_id || "",
+        chat_id: coze_chat_id || "",
+        botId: '7614096304390094889'
+      };
+      
+      const targetUrl = new URL(humanServiceUrl);
+      targetUrl.searchParams.append("channel", JSON.stringify(channelData));
+      
+      console.log("【自动转人工】跳转URL:", targetUrl.toString());
+      
+      // 直接跳转
+      window.location.href = targetUrl.toString();
+    }
+    
+    // 检查消息是否包含关键词
+    function checkAndAutoTransfer(text) {
+      if (hasAutoTransfered) return;
+      
+      const lowerText = text.toLowerCase();
+      for (const keyword of userMessageKeywords) {
+        if (lowerText.includes(keyword)) {
+          console.log("【自动转人工】检测到关键词:", keyword, "消息:", text);
+          autoTransferToHumanService();
+          return true;
+        }
+      }
+      return false;
+    }
+    
+    // 监听用户发送消息（通过 DOM 监听输入框和发送按钮）
+    function setupUserMessageListener() {
+      // 等待 Coze SDK 渲染完成
+      setTimeout(() => {
+        // 方法1: 监听所有输入框的键盘事件（检测回车键）
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            // 找到最近的有内容的输入框
+            const activeElem = document.activeElement;
+            if (activeElem && (activeElem.tagName === 'INPUT' || activeElem.tagName === 'TEXTAREA')) {
+              const text = activeElem.value.trim();
+              if (text) {
+                console.log("【用户发送消息】Enter键，消息:", text);
+                checkAndAutoTransfer(text);
+              }
+            }
+          }
+        });
+        
+        // 方法2: 监听发送按钮点击
+        document.addEventListener('click', function(e) {
+          // 查找发送按钮（Coze SDK 的发送按钮）
+          const sendBtn = e.target.closest('[class*="send"], [class*="submit"], [class*="button"]');
+          if (sendBtn) {
+            // 延迟一点获取输入框的值（等待值更新）
+            setTimeout(() => {
+              const inputElem = document.querySelector('input[class*="input"], textarea[class*="input"]');
+              if (inputElem && inputElem.value.trim()) {
+                console.log("【用户发送消息】点击发送按钮，消息:", inputElem.value.trim());
+                checkAndAutoTransfer(inputElem.value.trim());
+              }
+            }, 100);
+          }
+        });
+        
+        // 方法3: 监听 Coze SDK 消息发送事件
+        if (cozeClient && typeof cozeClient.on === 'function') {
+          try {
+            cozeClient.on('messageSend', (info) => {
+              console.log("【Coze事件 messageSend】", info);
+              if (info && info.content) {
+                checkAndAutoTransfer(info.content);
+              }
+            });
+            
+            cozeClient.on('messageSent', (info) => {
+              console.log("【Coze事件 messageSent】", info);
+              if (info && info.content) {
+                checkAndAutoTransfer(info.content);
+              }
+            });
+            
+            cozeClient.on('sendMessage', (info) => {
+              console.log("【Coze事件 sendMessage】", info);
+              if (info && info.content) {
+                checkAndAutoTransfer(info.content);
+              }
+            });
+          } catch (e) {
+            console.log("【自动转人工】SDK事件监听失败:", e.message);
+          }
+        }
+        
+        console.log("【自动转人工】用户消息监听已设置");
+      }, 3000); // 等待 Coze SDK 加载完成
+    }
+    
+    // 启动监听
+    setupUserMessageListener();
+    
+    console.log("【用户消息监听自动转人工功能已加载】");
   </script>
   
   <!-- 底部 -->

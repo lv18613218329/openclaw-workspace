@@ -35,6 +35,19 @@ const server = http.createServer((req, res) => {
   
   // 代理 Coze API 请求，解决 CORS 问题
   if (req.url.startsWith('/api/coze')) {
+    // 处理 CORS 预检请求
+    if (req.method === 'OPTIONS') {
+      console.log('处理 OPTIONS 预检请求 (代理)');
+      res.writeHead(200, {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Headers': '*',
+        'Access-Control-Max-Age': '86400'
+      });
+      res.end();
+      return;
+    }
+    
     const url = new URL(req.url, 'http://localhost');
     const conversation_id = url.searchParams.get('conversation_id');
     const bot_id = url.searchParams.get('bot_id');
