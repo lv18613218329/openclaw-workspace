@@ -1108,28 +1108,24 @@
     }
     
     // ========== 3.1.5 转人工跳转逻辑（必做） ==========
-    // 生成随机参数
-    function generateRandomParams() {
-      return {
-        session_key: String(Math.floor(Math.random() * 999999)),
-        web_token: Array.from({length: 32}, () => Math.floor(Math.random() * 16).toString(16)).join(''),
-        nonce: Array.from({length: 20}, () => Math.random().toString(36).charAt(Math.floor(Math.random() * 36))).join(''),
-        timestamp: String(Date.now()),
-        signature: Array.from({length: 32}, () => Math.floor(Math.random() * 16).toString(16)).join('')
-      };
-    }
+    // 固定的客服链接参数（从示例获取）
+    const UDESK_FIXED_PARAMS = {
+      web_token: "0e541487fb1948638a449e1710154a13",
+      nonce: "d3p8s718zn29k9l25j",
+      timestamp: "1776217492738",
+      signature: "903E666360D812ED0C2FB96A995294C6DC70475B"
+    };
 
-    // 构建跳转URL（包含所有参数）
+    // 构建跳转URL
     function buildHumanServiceUrl(channelData) {
       const humanServiceUrl = "https://yineng.s2.udesk.cn/im_client/";
-      const params = generateRandomParams();
       
       const targetUrl = new URL(humanServiceUrl);
-      targetUrl.searchParams.append("session_key", params.session_key);
-      targetUrl.searchParams.append("web_token", params.web_token);
-      targetUrl.searchParams.append("nonce", params.nonce);
-      targetUrl.searchParams.append("timestamp", params.timestamp);
-      targetUrl.searchParams.append("signature", params.signature);
+      targetUrl.searchParams.append("session_key", String(Math.floor(Math.random() * 999999)));
+      targetUrl.searchParams.append("web_token", UDESK_FIXED_PARAMS.web_token);
+      targetUrl.searchParams.append("nonce", UDESK_FIXED_PARAMS.nonce);
+      targetUrl.searchParams.append("timestamp", UDESK_FIXED_PARAMS.timestamp);
+      targetUrl.searchParams.append("signature", UDESK_FIXED_PARAMS.signature);
       targetUrl.searchParams.append("description", btoa(JSON.stringify(channelData)));
       
       return targetUrl.toString();
