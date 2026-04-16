@@ -399,9 +399,14 @@ function renderFloatWindow(messages, userId) {
 }
 
 // ========== 7. 监听页面和右侧面板变化 ==========
+let isInitializing = false; // 防止重复初始化
+
 function setupObserver() {
   // 监听整个页面变化（检测新的会话）
   const bodyObserver = new MutationObserver((mutations) => {
+    // 防止重复初始化
+    if (isInitializing) return;
+    
     // 检查是否需要重新初始化
     // 当检测到会话列表变化时，触发检测
     let shouldReinit = false;
@@ -428,7 +433,10 @@ function setupObserver() {
       // 防抖：延迟执行
       clearTimeout(window.cozeReinitTimer);
       window.cozeReinitTimer = setTimeout(() => {
-        init();
+        isInitializing = true;
+        init().finally(() => {
+          isInitializing = false;
+        });
       }, 1000);
     }
   });
