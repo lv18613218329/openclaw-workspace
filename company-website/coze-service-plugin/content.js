@@ -115,9 +115,89 @@ function getChannelDataFromDescription() {
       }
       
       console.log("Coze对话查看插件：找到描述字段=", descriptionTextarea ? (descriptionTextarea.id || 'unknown') : "未找到");
+      
+      // 添加"AI聊天记录"按钮
+      injectAIChatButton(descriptionTextarea);
+      
       resolve(descriptionTextarea);
     }, 800); // 等待DOM渲染
   });
+}
+
+// ========== 3.1 添加AI聊天记录按钮 ==========
+function injectAIChatButton(descriptionTextarea) {
+  // 检查按钮是否已存在
+  if (document.getElementById("coze-ai-chat-btn")) {
+    return;
+  }
+  
+  if (!descriptionTextarea) return;
+  
+  // 找到描述字段的容器
+  const container = descriptionTextarea.closest('tr, .ant-form-item, .form-item, .field-container, div');
+  if (!container) return;
+  
+  // 创建按钮
+  const btn = document.createElement("button");
+  btn.id = "coze-ai-chat-btn";
+  btn.innerText = "📋 AI聊天记录";
+  btn.style.cssText = `
+    margin-left: 10px;
+    padding: 4px 12px;
+    background: #1890ff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+  `;
+  
+  // 点击事件
+  btn.onclick = async () => {
+    console.log("Coze对话查看插件：点击了AI聊天记录按钮");
+    
+    const textboxValue = descriptionTextarea.value;
+    if (!textboxValue || !textboxValue.trim()) {
+      alert("未找到描述字段数据");
+      return;
+    }
+    
+    // 解析数据
+    let channelData;
+    try {
+      const decoded = base64Decode(textboxValue);
+      console.log("Coze对话查看插件：解码后的字符串=", decoded);
+      channelData = JSON.parse(decoded);
+      console.log("Coze对话查看插件：解析后的channelData=", channelData);
+    } catch (e) {
+      console.error("Coze对话查看插件：解析失败", e);
+      alert("解析描述字段失败");
+      return;
+    }
+    
+    const { conversation_id, user_id, chat_id, botId } = channelData;
+    
+    if (!conversation_id) {
+      alert("未找到conversation_id");
+      return;
+    }
+    
+    console.log("Coze对话查看插件：提取的conversation_id=", conversation_id);
+    console.log("Coze对话查看插件：提取的user_id=", user_id);
+    console.log("Coze对话查看插件：提取的chat_id=", chat_id);
+    console.log("Coze对话查看插件：提取的botId=", botId);
+    
+    // 加载聊天记录
+    await loadCozeChat(conversation_id, chat_id, user_id);
+  };
+  
+  // 插入按钮
+  const parent = descriptionTextarea.parentElement;
+  if (parent) {
+    parent.style.display = 'flex';
+    parent.style.alignItems = 'center';
+    parent.appendChild(btn);
+  }
 }
 
 // ========== 4. 主逻辑 ==========
