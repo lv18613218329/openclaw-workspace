@@ -268,8 +268,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
-import { useAdvancedStore } from '../store/advancedStore'
-import { useToolStore } from '../store/toolStore'
+import { useAdvancedStore } from '../viewModels/advancedStore'
+import { useToolStore } from '../viewModels/toolStore'
 
 const advancedStore = useAdvancedStore()
 const toolStore = useToolStore()

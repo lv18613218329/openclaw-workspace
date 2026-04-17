@@ -107,7 +107,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { usePageStore } from '../store/pageStore'
+import { usePageStore } from '../viewModels/pageStore'
 
 const pageStore = usePageStore()
 

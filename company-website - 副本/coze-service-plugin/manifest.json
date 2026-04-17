@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Coze对话查看插件",
+  "version": "1.0.1",
+  "description": "自动检测人工客服后台客户信息文本框中的JSON数据，拉取Coze完整对话记录，悬浮窗可视化展示（支持文字、图片、文件）",
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["https://api.coze.cn/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://yineng.s2.udesk.cn/entry/im*"],
+      "js": ["content.js"],
+      "css": ["style.css"],
+      "run_at": "document_end"
+    }
+  ]
+}

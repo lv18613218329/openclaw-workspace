@@ -54,7 +54,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useToolStore, type ToolType } from '../store/toolStore'
+import { useToolStore, type ToolType } from '../viewModels/toolStore'
 
 const toolStore = useToolStore()
 const activeIndex = ref(0)

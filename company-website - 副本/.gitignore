@@ -1,0 +1,9 @@
+# Node.js 便携版（太大，不推送到git）
+node.exe
+
+# 压缩包
+*.zip
+
+# 系统文件
+.DS_Store
+Thumbs.db

@@ -363,11 +363,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useToolStore } from '../store/toolStore'
-import { useHistoryStore } from '../store/historyStore'
-import { usePageStore } from '../store/pageStore'
-import { useFileStore } from '../store/fileStore'
-import { useAdvancedStore, type AdvancedFeature } from '../store/advancedStore'
+import { useToolStore } from '../viewModels/toolStore'
+import { useHistoryStore } from '../viewModels/historyStore'
+import { usePageStore } from '../viewModels/pageStore'
+import { useFileStore } from '../viewModels/fileStore'
+import { useAdvancedStore, type AdvancedFeature } from '../viewModels/advancedStore'
 import { 
   saveProjectToFile, 
   loadProjectFromFile, 
@@ -377,7 +377,7 @@ import {
   autoSaveToLocalStorage,
   restoreFromLocalStorage,
   clearAutoSave
-} from '../store/fileService'
+} from '../viewModels/fileService'
 
 const toolStore = useToolStore()
 const historyStore = useHistoryStore()

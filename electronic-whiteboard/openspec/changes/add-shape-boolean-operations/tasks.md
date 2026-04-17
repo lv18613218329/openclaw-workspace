@@ -19,6 +19,8 @@
 - [x] 3.5 实现分割(Clip)运算逻辑 - 已通过clipTwo方法实现
 - [x] 3.6 实现图形相交检测功能 - 已通过checkIntersection方法实现
 
+约束：
+
 ## 4. UI界面实现
 
 - [x] 4.1 在工具栏添加布尔运算区域 - 在RightPanel.vue中添加了布尔运算部分
